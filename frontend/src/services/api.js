@@ -1,118 +1,115 @@
-/**
- * Сервис для работы с API бэкенда.
- * Содержит все функции для отправки HTTP запросов.
- */
-
 import axios from 'axios';
 
-// Создаем экземпляр axios с базовыми настройками
 const apiClient = axios.create({
-  // Базовый URL для всех запросов
   baseURL: 'http://localhost:8000',
-  
-  // Общие заголовки для всех запросов
   headers: {
     'Content-Type': 'application/json',
-    'Accept': 'application/json'
   },
-  
-  // Таймаут запроса (в миллисекундах)
-  timeout: 10000
+  timeout: 10000,
 });
 
-// Интерцептор для обработки ошибок
+// Интерцептор для успешных ответов
 apiClient.interceptors.response.use(
-  // Если запрос успешный, просто возвращаем ответ
-  (response) => response,
-  
-  // Если произошла ошибка
-  (error) => {
-    console.error('API Error:', error);
+  (response) => {
+    console.log(`✅ ${response.config.method.toUpperCase()} ${response.config.url}: ${response.status}`);
     
-    // Пробрасываем ошибку дальше для обработки в компонентах
+    // Показываем уведомление для успешных операций (кроме GET)
+    if (response.config.method !== 'get') {
+      const actionMap = {
+        'post': 'создана',
+        'put': 'обновлена',
+        'delete': 'удалена',
+        'patch': 'обновлена'
+      };
+      
+      const action = actionMap[response.config.method] || 'выполнена';
+      
+      // Используем глобальный метод уведомлений
+      if (window.appInstance) {
+        window.appInstance.config.globalProperties.$notify.success(
+          `Задача успешно ${action}`,
+          'Успех!'
+        );
+      }
+    }
+    
+    return response;
+  },
+  
+  // Интерцептор для ошибок
+  (error) => {
+    console.error(`❌ API Error:`, {
+      url: error.config?.url,
+      method: error.config?.method,
+      status: error.response?.status,
+      data: error.response?.data,
+      message: error.message
+    });
+    
+    // Показываем уведомление об ошибке
+    let errorMessage = 'Ошибка сети';
+    
+    if (error.response) {
+      const status = error.response.status;
+      
+      if (status === 400) errorMessage = 'Неверный запрос';
+      else if (status === 401) errorMessage = 'Требуется авторизация';
+      else if (status === 403) errorMessage = 'Доступ запрещен';
+      else if (status === 404) errorMessage = 'Ресурс не найден';
+      else if (status === 422) errorMessage = 'Ошибка валидации данных';
+      else if (status === 429) errorMessage = 'Слишком много запросов';
+      else if (status >= 500) errorMessage = 'Внутренняя ошибка сервера';
+      else errorMessage = `Ошибка ${status}`;
+      
+      // Показываем детали ошибки если есть
+      if (error.response.data?.detail) {
+        const detail = error.response.data.detail;
+        if (Array.isArray(detail)) {
+          errorMessage += ': ' + detail.map(d => d.msg).join(', ');
+        } else if (typeof detail === 'string') {
+          errorMessage += ': ' + detail;
+        }
+      }
+    } else if (error.request) {
+      errorMessage = 'Нет ответа от сервера. Проверьте подключение.';
+    } else {
+      errorMessage = 'Ошибка при отправке запроса';
+    }
+    
+    // Используем глобальный метод уведомлений
+    if (window.appInstance) {
+      window.appInstance.config.globalProperties.$notify.error(errorMessage, 'Ошибка');
+    }
+    
     return Promise.reject(error);
   }
 );
 
-// Сервис для работы с задачами
-const taskService = {
-  /**
-   * Получает список задач с пагинацией и фильтрацией.
-   * 
-   * @param {number} skip - сколько задач пропустить
-   * @param {number} limit - максимальное количество задач
-   * @param {boolean|null} completed - фильтр по статусу выполнения
-   * @returns {Promise} Promise с данными задач
-   */
+// Методы API
+export default {
   getTasks(skip = 0, limit = 100, completed = null) {
-    // Создаем объект с параметрами запроса
     const params = { skip, limit };
-    
-    // Добавляем фильтр по статусу, если он указан
-    if (completed !== null) {
-      params.completed = completed;
-    }
-    
-    // Отправляем GET запрос с параметрами
+    if (completed !== null) params.completed = completed;
     return apiClient.get('/tasks', { params });
   },
   
-  /**
-   * Получает задачу по ID.
-   * 
-   * @param {number} id - ID задачи
-   * @returns {Promise} Promise с данными задачи
-   */
   getTask(id) {
     return apiClient.get(`/tasks/${id}`);
   },
   
-  /**
-   * Создает новую задачу.
-   * 
-   * @param {Object} taskData - данные задачи
-   * @param {string} taskData.title - заголовок задачи
-   * @param {string} [taskData.description] - описание задачи
-   * @returns {Promise} Promise с созданной задачей
-   */
-  /*createTask(taskData) {
-    return apiClient.post('/tasks', taskData);
-  },*/
   createTask(taskData) {
-  return apiClient.post('/tasks', taskData);  // Просто отправляем JSON
-},
+    return apiClient.post('/tasks', taskData);
+  },
   
-  /**
-   * Обновляет существующую задачу.
-   * 
-   * @param {number} id - ID задачи
-   * @param {Object} taskData - данные для обновления
-   * @returns {Promise} Promise с обновленной задачей
-   */
   updateTask(id, taskData) {
     return apiClient.put(`/tasks/${id}`, taskData);
   },
   
-  /**
-   * Удаляет задачу.
-   * 
-   * @param {number} id - ID задачи
-   * @returns {Promise} Promise без данных (статус 204)
-   */
   deleteTask(id) {
     return apiClient.delete(`/tasks/${id}`);
   },
   
-  /**
-   * Отмечает задачу как выполненную.
-   * 
-   * @param {number} id - ID задачи
-   * @returns {Promise} Promise с обновленной задачей
-   */
   completeTask(id) {
     return apiClient.patch(`/tasks/${id}/complete`);
   }
 };
-
-// Экспортируем сервис для использования в компонентах
-export default taskService;
