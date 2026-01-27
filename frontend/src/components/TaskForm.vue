@@ -1,142 +1,201 @@
 <template>
   <div class="task-form">
+    <h3 v-if="editing">✏️ Редактирование задачи</h3>
+    <h3 v-else>➕ Новая задача</h3>
+    
     <form @submit.prevent="handleSubmit">
       <div class="form-group">
-        <label for="title">Заголовок задачи *</label>
+        <label for="title">Заголовок *</label>
         <input
           type="text"
           id="title"
-          v-model="title"
+          v-model="formData.title"
           placeholder="Что нужно сделать?"
           required
-          maxlength="255"
           :disabled="loading"
+          @input="clearError"
         />
-        <div class="char-counter">{{ title.length }}/255</div>
       </div>
       
       <div class="form-group">
-        <label for="description">Описание (необязательно)</label>
+        <label for="description">Описание</label>
         <textarea
           id="description"
-          v-model="description"
-          placeholder="Подробное описание задачи..."
+          v-model="formData.description"
+          placeholder="Подробное описание..."
           rows="3"
-          maxlength="2000"
           :disabled="loading"
         ></textarea>
-        <div class="char-counter">{{ description.length }}/2000</div>
+      </div>
+      
+      <div class="form-group" v-if="editing">
+        <label class="checkbox-label">
+          <input 
+            type="checkbox" 
+            v-model="formData.is_completed"
+            :disabled="loading"
+          />
+          <span>Задача выполнена</span>
+        </label>
       </div>
       
       <div class="form-actions">
         <button 
           type="submit" 
+          :disabled="loading || !formData.title.trim()"
           class="btn btn-primary"
-          :disabled="loading || !title.trim()"
         >
-          <span v-if="loading">Добавление...</span>
-          <span v-else>Добавить задачу</span>
+          <span v-if="loading">{{ editing ? 'Сохранение...' : 'Создание...' }}</span>
+          <span v-else>{{ editing ? 'Сохранить' : 'Создать задачу' }}</span>
         </button>
         
         <button 
           type="button" 
-          class="btn btn-secondary"
           @click="resetForm"
+          class="btn btn-secondary"
           :disabled="loading"
         >
-          Очистить
+          {{ editing ? 'Отмена' : 'Очистить' }}
+        </button>
+        
+        <button 
+          v-if="editing"
+          type="button" 
+          @click="$emit('cancel-edit')"
+          class="btn btn-secondary"
+          :disabled="loading"
+        >
+          Закрыть
         </button>
       </div>
       
       <div v-if="error" class="error-message">
         {{ error }}
       </div>
+      
+      <div v-if="success" class="success-message">
+        ✅ {{ editing ? 'Задача обновлена!' : 'Задача успешно создана!' }}
+      </div>
     </form>
   </div>
 </template>
 
 <script>
-import taskService from '../services/api';
+import api from '../services/api';
 
 export default {
   name: 'TaskForm',
-  
+  props: {
+    editing: {
+      type: Boolean,
+      default: false
+    },
+    task: {
+      type: Object,
+      default: null
+    }
+  },
+  emits: ['task-created', 'task-updated', 'cancel-edit'],
   data() {
     return {
-      // Данные формы
-      title: '',
-      description: '',
-      
-      // Состояния формы
+      formData: {
+        title: '',
+        description: '',
+        is_completed: false
+      },
       loading: false,
-      error: null
+      error: null,
+      success: false
     };
   },
-  
+  watch: {
+    task: {
+      immediate: true,
+      handler(newTask) {
+        if (newTask) {
+          this.formData = {
+            title: newTask.title || '',
+            description: newTask.description || '',
+            is_completed: newTask.is_completed || false
+          };
+        }
+      }
+    }
+  },
   methods: {
-    /**
-     * Обрабатывает отправку формы.
-     */
     async handleSubmit() {
-      // Проверяем, что заголовок не пустой
-      if (!this.title.trim()) {
-        this.error = 'Заголовок задачи не может быть пустым';
+      if (!this.formData.title.trim()) {
+        this.error = 'Введите заголовок задачи';
+        this.$notify.error('Заголовок задачи не может быть пустым', 'Ошибка');
         return;
       }
       
-      // Сбрасываем предыдущую ошибку
-      this.error = null;
       this.loading = true;
+      this.error = null;
+      this.success = false;
       
       try {
-        // Создаем объект с данными задачи
         const taskData = {
-          title: this.title.trim(),
-          description: this.description.trim() || null
+          title: this.formData.title.trim(),
+          description: this.formData.description.trim() || null
         };
         
-        // Отправляем запрос на создание задачи
-        const response = await taskService.createTask(taskData);
+        if (this.editing) {
+          taskData.is_completed = this.formData.is_completed;
+        }
         
-        // Извещаем родительский компонент о новой задаче
-        this.$emit('task-added', response.data);
+        let response;
+        if (this.editing && this.task) {
+          response = await api.updateTask(this.task.id, taskData);
+          this.$emit('task-updated', response.data);
+        } else {
+          response = await api.createTask(taskData);
+          this.$emit('task-created', response.data);
+        }
         
-        // Сбрасываем форму
-        this.resetForm();
+        this.success = true;
         
-        // Показываем сообщение об успехе
-        alert('Задача успешно добавлена!');
+        if (!this.editing) {
+          this.resetForm();
+        }
+        
+        // Автоматически скрыть сообщение об успехе
+        setTimeout(() => {
+          this.success = false;
+          if (this.editing) {
+            this.$emit('cancel-edit');
+          }
+        }, 2000);
         
       } catch (error) {
-        console.error('Ошибка при создании задачи:', error);
-        
-        // Формируем понятное сообщение об ошибке
-        if (error.response) {
-          // Сервер ответил с кодом ошибки
-          if (error.response.status === 422) {
-            this.error = 'Проверьте правильность заполнения формы';
-          } else {
-            this.error = `Ошибка сервера: ${error.response.status}`;
-          }
-        } else if (error.request) {
-          // Запрос был отправлен, но ответа не получено
-          this.error = 'Не удалось подключиться к серверу. Проверьте подключение к интернету.';
+        console.error('Ошибка операции с задачей:', error);
+        // Уведомление об ошибке уже показывается через интерцептор API
+        if (error.response?.status === 422) {
+          this.error = 'Ошибка валидации данных. Проверьте введенные данные.';
+        } else if (error.response?.status === 404) {
+          this.error = 'Задача не найдена. Возможно, она была удалена.';
         } else {
-          // Ошибка при настройке запроса
-          this.error = 'Ошибка при отправке запроса';
+          this.error = 'Произошла ошибка. Попробуйте еще раз.';
         }
       } finally {
         this.loading = false;
       }
     },
     
-    /**
-     * Сбрасывает форму к исходному состоянию.
-     */
     resetForm() {
-      this.title = '';
-      this.description = '';
+      this.formData = {
+        title: '',
+        description: '',
+        is_completed: false
+      };
       this.error = null;
+      this.success = false;
+    },
+    
+    clearError() {
+      if (this.error) {
+        this.error = null;
+      }
     }
   }
 };
@@ -146,9 +205,15 @@ export default {
 .task-form {
   background: white;
   padding: 25px;
-  border-radius: 12px;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
   margin-bottom: 30px;
+  animation: fadeIn 0.5s ease-out;
+}
+
+.task-form h3 {
+  margin-bottom: 20px;
+  color: #333;
 }
 
 .form-group {
@@ -158,65 +223,109 @@ export default {
 .form-group label {
   display: block;
   margin-bottom: 8px;
-  font-weight: 600;
-  color: #444;
+  font-weight: bold;
+  color: #555;
 }
 
 .form-group input,
 .form-group textarea {
   width: 100%;
-  padding: 12px 15px;
-  border: 2px solid #e0e0e0;
-  border-radius: 8px;
+  padding: 10px 12px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
   font-size: 16px;
   font-family: inherit;
-  transition: border-color 0.3s ease;
 }
 
 .form-group input:focus,
 .form-group textarea:focus {
   outline: none;
-  border-color: #667eea;
+  border-color: #2196f3;
+  box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.1);
+  animation: inputFocus 0.3s ease-out;
+}
+
+@keyframes inputFocus {
+  0% { box-shadow: 0 0 0 0 rgba(33, 150, 243, 0.4); }
+  100% { box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.1); }
 }
 
 .form-group input:disabled,
 .form-group textarea:disabled {
-  background-color: #f5f5f5;
+  background: #f5f5f5;
   cursor: not-allowed;
 }
 
-.char-counter {
-  text-align: right;
-  font-size: 12px;
-  color: #888;
-  margin-top: 5px;
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.checkbox-label input {
+  margin-right: 8px;
+}
+
+.checkbox-label span {
+  user-select: none;
 }
 
 .form-actions {
   display: flex;
-  gap: 15px;
+  gap: 10px;
   margin-top: 25px;
 }
 
 .btn {
-  padding: 12px 24px;
+  padding: 10px 20px;
   border: none;
-  border-radius: 8px;
+  border-radius: 5px;
   font-size: 16px;
-  font-weight: 600;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
   flex: 1;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 5px;
+  height: 5px;
+  background: rgba(255, 255, 255, 0.5);
+  opacity: 0;
+  border-radius: 100%;
+  transform: scale(1, 1) translate(-50%);
+  transform-origin: 50% 50%;
+}
+
+.btn:focus:not(:active)::after {
+  animation: ripple 1s ease-out;
+}
+
+@keyframes ripple {
+  0% {
+    transform: scale(0, 0);
+    opacity: 0.5;
+  }
+  100% {
+    transform: scale(20, 20);
+    opacity: 0;
+  }
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #2196f3;
   color: white;
 }
 
 .btn-primary:hover:not(:disabled) {
-  transform: translateY(-2px);
-  box-shadow: 0 7px 14px rgba(102, 126, 234, 0.3);
+  background: #1976d2;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
 }
 
 .btn-primary:disabled {
@@ -225,12 +334,14 @@ export default {
 }
 
 .btn-secondary {
-  background: #f0f0f0;
+  background: #f5f5f5;
   color: #666;
 }
 
 .btn-secondary:hover:not(:disabled) {
   background: #e0e0e0;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
 }
 
 .btn-secondary:disabled {
@@ -241,9 +352,26 @@ export default {
 .error-message {
   margin-top: 15px;
   padding: 10px 15px;
-  background: #ffe6e6;
+  background: #ffebee;
   color: #d32f2f;
-  border-radius: 6px;
-  font-size: 14px;
+  border-radius: 5px;
+  border-left: 4px solid #f44336;
+  animation: shake 0.5s ease-in-out;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+  20%, 40%, 60%, 80% { transform: translateX(5px); }
+}
+
+.success-message {
+  margin-top: 15px;
+  padding: 10px 15px;
+  background: #e8f5e9;
+  color: #2e7d32;
+  border-radius: 5px;
+  border-left: 4px solid #4caf50;
+  animation: slideInRight 0.5s ease-out;
 }
 </style>
