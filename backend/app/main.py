@@ -474,7 +474,7 @@ def favicon():
 if __name__ == "__main__":
     """
     Точка входа для запуска приложения напрямую (python main.py).
-    В production обычно используется uvicorn напрямую.
+    В bookion обычно используется uvicorn напрямую.
     """
     import uvicorn
     
