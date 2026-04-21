@@ -212,7 +212,7 @@ export default {
 * {
   margin: 0;
   padding: 0;
-  box-sizing: border-box;
+  box-sizing: bappointment-box;
 }
 
 body {
@@ -263,10 +263,10 @@ body {
 
 .filter-btn {
   padding: 8px 16px;
-  border: 2px solid #667eea;
+  bappointment: 2px solid #667eea;
   background: white;
   color: #667eea;
-  border-radius: 20px;
+  bappointment-radius: 20px;
   cursor: pointer;
   font-weight: 600;
   transition: all 0.3s ease;
@@ -287,7 +287,7 @@ body {
   margin-top: 30px;
   padding: 15px;
   background: white;
-  border-radius: 10px;
+  bappointment-radius: 10px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
 }
 

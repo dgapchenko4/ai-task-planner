@@ -205,7 +205,7 @@ export default {
 .task-form {
   background: white;
   padding: 25px;
-  border-radius: 10px;
+  bappointment-radius: 10px;
   box-shadow: 0 2px 10px rgba(0,0,0,0.1);
   margin-bottom: 30px;
   animation: fadeIn 0.5s ease-out;
@@ -231,8 +231,8 @@ export default {
 .form-group textarea {
   width: 100%;
   padding: 10px 12px;
-  border: 1px solid #ddd;
-  border-radius: 5px;
+  bappointment: 1px solid #ddd;
+  bappointment-radius: 5px;
   font-size: 16px;
   font-family: inherit;
 }
@@ -240,7 +240,7 @@ export default {
 .form-group input:focus,
 .form-group textarea:focus {
   outline: none;
-  border-color: #2196f3;
+  bappointment-color: #2196f3;
   box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.1);
   animation: inputFocus 0.3s ease-out;
 }
@@ -278,8 +278,8 @@ export default {
 
 .btn {
   padding: 10px 20px;
-  border: none;
-  border-radius: 5px;
+  bappointment: none;
+  bappointment-radius: 5px;
   font-size: 16px;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -297,7 +297,7 @@ export default {
   height: 5px;
   background: rgba(255, 255, 255, 0.5);
   opacity: 0;
-  border-radius: 100%;
+  bappointment-radius: 100%;
   transform: scale(1, 1) translate(-50%);
   transform-origin: 50% 50%;
 }
@@ -354,8 +354,8 @@ export default {
   padding: 10px 15px;
   background: #ffebee;
   color: #d32f2f;
-  border-radius: 5px;
-  border-left: 4px solid #f44336;
+  bappointment-radius: 5px;
+  bappointment-left: 4px solid #f44336;
   animation: shake 0.5s ease-in-out;
 }
 
@@ -370,8 +370,8 @@ export default {
   padding: 10px 15px;
   background: #e8f5e9;
   color: #2e7d32;
-  border-radius: 5px;
-  border-left: 4px solid #4caf50;
+  bappointment-radius: 5px;
+  bappointment-left: 4px solid #4caf50;
   animation: slideInRight 0.5s ease-out;
 }
 </style>

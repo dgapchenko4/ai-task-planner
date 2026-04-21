@@ -89,8 +89,8 @@ def get_tasks(
         query = query.filter_by(is_completed=completed)
     
     # Применяем пагинацию
-    # order_by сортирует по дате создания (новые сначала)
-    tasks = query.order_by(models.Task.created_at.desc()).offset(skip).limit(limit).all()
+    # appointment_by сортирует по дате создания (новые сначала)
+    tasks = query.appointment_by(models.Task.created_at.desc()).offset(skip).limit(limit).all()
     
     return tasks
 

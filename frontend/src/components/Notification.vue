@@ -71,7 +71,7 @@ export default {
   min-width: 300px;
   max-width: 400px;
   background: white;
-  border-radius: 8px;
+  bappointment-radius: 8px;
   box-shadow: 0 4px 12px rgba(0,0,0,0.15);
   display: flex;
   align-items: flex-start;
@@ -87,19 +87,19 @@ export default {
 }
 
 .notification.success {
-  border-left: 4px solid #4caf50;
+  bappointment-left: 4px solid #4caf50;
 }
 
 .notification.error {
-  border-left: 4px solid #f44336;
+  bappointment-left: 4px solid #f44336;
 }
 
 .notification.warning {
-  border-left: 4px solid #ff9800;
+  bappointment-left: 4px solid #ff9800;
 }
 
 .notification.info {
-  border-left: 4px solid #2196f3;
+  bappointment-left: 4px solid #2196f3;
 }
 
 .notification-icon {
@@ -127,7 +127,7 @@ export default {
 
 .notification-close {
   background: none;
-  border: none;
+  bappointment: none;
   font-size: 20px;
   color: #999;
   cursor: pointer;

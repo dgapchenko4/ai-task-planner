@@ -146,7 +146,7 @@ export default {
 .task-form {
   background: white;
   padding: 25px;
-  border-radius: 12px;
+  bappointment-radius: 12px;
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
   margin-bottom: 30px;
 }
@@ -166,17 +166,17 @@ export default {
 .form-group textarea {
   width: 100%;
   padding: 12px 15px;
-  border: 2px solid #e0e0e0;
-  border-radius: 8px;
+  bappointment: 2px solid #e0e0e0;
+  bappointment-radius: 8px;
   font-size: 16px;
   font-family: inherit;
-  transition: border-color 0.3s ease;
+  transition: bappointment-color 0.3s ease;
 }
 
 .form-group input:focus,
 .form-group textarea:focus {
   outline: none;
-  border-color: #667eea;
+  bappointment-color: #667eea;
 }
 
 .form-group input:disabled,
@@ -200,8 +200,8 @@ export default {
 
 .btn {
   padding: 12px 24px;
-  border: none;
-  border-radius: 8px;
+  bappointment: none;
+  bappointment-radius: 8px;
   font-size: 16px;
   font-weight: 600;
   cursor: pointer;
@@ -243,7 +243,7 @@ export default {
   padding: 10px 15px;
   background: #ffe6e6;
   color: #d32f2f;
-  border-radius: 6px;
+  bappointment-radius: 6px;
   font-size: 14px;
 }
 </style>

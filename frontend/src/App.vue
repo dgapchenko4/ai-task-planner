@@ -246,7 +246,7 @@ export default {
 * {
   margin: 0;
   padding: 0;
-  box-sizing: border-box;
+  box-sizing: bappointment-box;
 }
 
 body {
@@ -294,10 +294,10 @@ body {
 
 .filter-btn {
   padding: 8px 16px;
-  border: 2px solid #667eea;
+  bappointment: 2px solid #667eea;
   background: white;
   color: #667eea;
-  border-radius: 20px;
+  bappointment-radius: 20px;
   cursor: pointer;
   font-weight: 600;
   transition: all 0.3s ease;
@@ -322,17 +322,17 @@ body {
 .spinner {
   width: 50px;
   height: 50px;
-  border: 5px solid #f3f3f3;
-  border-top: 5px solid #667eea;
-  border-radius: 50%;
+  bappointment: 5px solid #f3f3f3;
+  bappointment-top: 5px solid #667eea;
+  bappointment-radius: 50%;
   animation: spin 1s linear infinite;
   margin-bottom: 20px;
 }
 
 .error {
   background: #fff3f3;
-  border: 2px solid #ffcdd2;
-  border-radius: 10px;
+  bappointment: 2px solid #ffcdd2;
+  bappointment-radius: 10px;
   padding: 25px;
   margin-bottom: 30px;
   text-align: center;
@@ -348,8 +348,8 @@ body {
   padding: 10px 20px;
   background: #1976d2;
   color: white;
-  border: none;
-  border-radius: 5px;
+  bappointment: none;
+  bappointment-radius: 5px;
   cursor: pointer;
   font-weight: bold;
 }
@@ -359,7 +359,7 @@ body {
   margin-top: 30px;
   padding: 15px;
   background: white;
-  border-radius: 10px;
+  bappointment-radius: 10px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
 }
 
@@ -376,7 +376,7 @@ body {
   text-align: center;
   padding: 60px 20px;
   background: white;
-  border-radius: 12px;
+  bappointment-radius: 12px;
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
   color: #888;
   font-size: 1.1rem;

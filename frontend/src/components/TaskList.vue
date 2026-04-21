@@ -350,9 +350,9 @@ export default {
   display: inline-block;
   width: 50px;
   height: 50px;
-  border: 5px solid #f3f3f3;
-  border-top: 5px solid #667eea;
-  border-radius: 50%;
+  bappointment: 5px solid #f3f3f3;
+  bappointment-top: 5px solid #667eea;
+  bappointment-radius: 50%;
   animation: spin 1s linear infinite;
   margin-bottom: 20px;
 }
@@ -372,7 +372,7 @@ export default {
   text-align: center;
   padding: 60px 20px;
   background: white;
-  border-radius: 12px;
+  bappointment-radius: 12px;
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
 }
 
@@ -404,10 +404,10 @@ export default {
   align-items: flex-start;
   background: white;
   padding: 20px;
-  border-radius: 12px;
+  bappointment-radius: 12px;
   box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
   transition: all 0.3s ease;
-  border-left: 5px solid #667eea;
+  bappointment-left: 5px solid #667eea;
 }
 
 .task-item:hover {
@@ -416,7 +416,7 @@ export default {
 }
 
 .task-item.completed {
-  border-left-color: #4caf50;
+  bappointment-left-color: #4caf50;
   opacity: 0.8;
 }
 
@@ -434,20 +434,20 @@ export default {
   display: block;
   width: 24px;
   height: 24px;
-  border: 2px solid #ddd;
-  border-radius: 6px;
+  bappointment: 2px solid #ddd;
+  bappointment-radius: 6px;
   cursor: pointer;
   transition: all 0.3s ease;
   position: relative;
 }
 
 .task-checkbox label:hover {
-  border-color: #667eea;
+  bappointment-color: #667eea;
 }
 
 .task-checkbox input[type="checkbox"]:checked + label {
   background-color: #4caf50;
-  border-color: #4caf50;
+  bappointment-color: #4caf50;
 }
 
 .task-checkbox input[type="checkbox"]:checked + label::after {
@@ -511,8 +511,8 @@ export default {
 .btn-action {
   width: 40px;
   height: 40px;
-  border: none;
-  border-radius: 8px;
+  bappointment: none;
+  bappointment-radius: 8px;
   background: #f5f5f5;
   font-size: 18px;
   cursor: pointer;
@@ -555,7 +555,7 @@ export default {
 
 .modal {
   background: white;
-  border-radius: 12px;
+  bappointment-radius: 12px;
   width: 100%;
   max-width: 500px;
   max-height: 90vh;
@@ -568,7 +568,7 @@ export default {
   justify-content: space-between;
   align-items: center;
   padding: 20px;
-  border-bottom: 1px solid #eee;
+  bappointment-bottom: 1px solid #eee;
 }
 
 .modal-header h3 {
@@ -578,13 +578,13 @@ export default {
 
 .modal-close {
   background: none;
-  border: none;
+  bappointment: none;
   font-size: 24px;
   cursor: pointer;
   color: #888;
   width: 30px;
   height: 30px;
-  border-radius: 50%;
+  bappointment-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -600,7 +600,7 @@ export default {
 
 .modal-footer {
   padding: 20px;
-  border-top: 1px solid #eee;
+  bappointment-top: 1px solid #eee;
   display: flex;
   justify-content: flex-end;
   gap: 10px;

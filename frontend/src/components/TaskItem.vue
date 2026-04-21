@@ -113,13 +113,13 @@ export default {
 .task-item {
   background: white;
   padding: 20px;
-  border-radius: 8px;
+  bappointment-radius: 8px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
   margin-bottom: 15px;
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  border-left: 4px solid #2196f3;
+  bappointment-left: 4px solid #2196f3;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -129,7 +129,7 @@ export default {
 }
 
 .task-item.completed {
-  border-left-color: #4caf50;
+  bappointment-left-color: #4caf50;
   opacity: 0.8;
 }
 
@@ -177,7 +177,7 @@ export default {
 
 .status {
   padding: 4px 8px;
-  border-radius: 4px;
+  bappointment-radius: 4px;
   font-size: 12px;
   font-weight: bold;
   white-space: nowrap;
@@ -197,7 +197,7 @@ export default {
   font-size: 11px;
   color: #666;
   padding: 2px 6px;
-  border-radius: 3px;
+  bappointment-radius: 3px;
   background: #f5f5f5;
 }
 
@@ -226,7 +226,7 @@ export default {
 .task-id {
   background: #f5f5f5;
   padding: 2px 6px;
-  border-radius: 3px;
+  bappointment-radius: 3px;
   font-family: monospace;
 }
 
@@ -240,8 +240,8 @@ export default {
 .btn-action {
   width: 36px;
   height: 36px;
-  border: none;
-  border-radius: 6px;
+  bappointment: none;
+  bappointment-radius: 6px;
   background: #f5f5f5;
   cursor: pointer;
   font-size: 16px;

@@ -179,7 +179,7 @@ def get_tasks(
         total = query.count()
         
         # Применяем пагинацию и сортировку (новые задачи сначала)
-        tasks = query.order_by(models.Task.created_at.desc()).offset(skip).limit(limit).all()
+        tasks = query.appointment_by(models.Task.created_at.desc()).offset(skip).limit(limit).all()
         
         # Преобразуем объекты SQLAlchemy в словари для JSON сериализации
         tasks_list = [task_to_dict(task) for task in tasks]
