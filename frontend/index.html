@@ -3,997 +3,228 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Task Planner - Умный планировщик задач</title>
+    <title>AI Task Planner</title>
     <style>
-        /* ===== БАЗОВЫЕ СТИЛИ ===== */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: Arial, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             padding: 20px;
-            position: relative;
         }
-
         .container {
-            max-width: 1200px;
+            max-width: 800px;
             margin: 0 auto;
             background: white;
             border-radius: 20px;
             padding: 30px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            animation: fadeIn 0.5s ease;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
         }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* ===== ЗАГОЛОВКИ ===== */
-        h1 {
-            text-align: center;
-            color: #333;
-            margin-bottom: 10px;
-            font-size: 2.5rem;
-        }
-
-        h1 .ai-icon {
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .subtitle {
-            text-align: center;
-            color: #666;
-            margin-bottom: 30px;
-            font-size: 1.1rem;
-        }
-
-        /* ===== СТАТУС ===== */
-        .status {
-            padding: 12px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            text-align: center;
-            font-weight: 500;
-            transition: all 0.3s;
-        }
-
-        .status.online {
-            background: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-
-        .status.offline {
-            background: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
-
-        /* ===== ФОРМА ВВОДА ===== */
-        .input-section {
-            margin-bottom: 30px;
-        }
-
+        h1 { text-align: center; margin-bottom: 10px; }
+        .subtitle { text-align: center; color: #666; margin-bottom: 20px; }
         textarea {
             width: 100%;
             padding: 15px;
-            border: 2px solid #e0e0e0;
-            border-radius: 12px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
             font-size: 16px;
-            font-family: inherit;
-            resize: vertical;
-            transition: all 0.3s;
+            margin-bottom: 15px;
         }
-
-        textarea:focus {
-            outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-        }
-
-        .button-group {
-            display: flex;
-            gap: 15px;
-            margin-top: 15px;
-            flex-wrap: wrap;
-        }
-
         button {
-            background: linear-gradient(135deg, #667eea, #764ba2);
+            background: #667eea;
             color: white;
             border: none;
             padding: 12px 30px;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            width: 100%;
+        }
+        button:hover { background: #5a67d8; }
+        .task {
+            background: #f8f9fa;
+            padding: 15px;
             border-radius: 10px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
+            margin-top: 15px;
+            border-left: 4px solid #667eea;
         }
-
-        button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
-        }
-
-        button:active {
-            transform: translateY(0);
-        }
-
-        button:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-        }
-
-        .btn-secondary {
-            background: linear-gradient(135deg, #6c757d, #495057);
-        }
-
-        /* ===== ПРИМЕРЫ ===== */
-        .examples {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-            margin: 20px 0;
-        }
-
-        .example-btn {
-            background: #f0f0f0;
-            color: #333;
-            padding: 8px 16px;
-            font-size: 13px;
-            font-weight: normal;
-            box-shadow: none;
-        }
-
-        .example-btn:hover {
-            background: #e0e0e0;
-            transform: translateY(-1px);
-        }
-
-        /* ===== РЕЗУЛЬТАТ AI ===== */
-        .ai-thinking {
-            text-align: center;
-            padding: 30px;
-            background: #f8f9fa;
-            border-radius: 12px;
-            margin: 20px 0;
-        }
-
-        .spinner {
-            display: inline-block;
-            width: 40px;
-            height: 40px;
-            border: 4px solid #e0e0e0;
-            border-top-color: #667eea;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        .result-card {
-            background: #d4edda;
-            padding: 20px;
-            border-radius: 12px;
-            margin: 20px 0;
-            border-left: 4px solid #28a745;
-            animation: slideIn 0.3s ease;
-        }
-
-        .error-card {
-            background: #f8d7da;
-            padding: 20px;
-            border-radius: 12px;
-            margin: 20px 0;
-            border-left: 4px solid #dc3545;
-            animation: slideIn 0.3s ease;
-        }
-
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateY(-10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        /* ===== ЗАДАЧИ ===== */
-        .tasks-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin: 30px 0 20px;
-            flex-wrap: wrap;
-            gap: 15px;
-        }
-
-        .tasks-header h2 {
-            color: #333;
-        }
-
-        .task-stats {
-            display: flex;
-            gap: 15px;
-        }
-
-        .stat-badge {
-            background: #f0f0f0;
-            padding: 5px 12px;
-            border-radius: 20px;
-            font-size: 14px;
-            color: #666;
-        }
-
-        .tasks-container {
-            min-height: 200px;
-        }
-
-        .task-item {
-            background: #f8f9fa;
-            border-radius: 12px;
-            padding: 18px;
-            margin-bottom: 12px;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            transition: all 0.3s;
-            animation: slideIn 0.3s ease;
-        }
-
-        .task-item:hover {
-            transform: translateX(5px);
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-        }
-
-        .task-item.completed {
-            opacity: 0.6;
-            background: #e9ecef;
-        }
-
-        .task-item.completed .task-title {
-            text-decoration: line-through;
-        }
-
-        .task-checkbox {
-            width: 22px;
-            height: 22px;
-            cursor: pointer;
-        }
-
-        .task-content {
-            flex: 1;
-        }
-
-        .task-title {
-            font-size: 16px;
-            font-weight: 500;
-            color: #333;
-            margin-bottom: 8px;
-        }
-
-        .task-meta {
-            display: flex;
-            gap: 15px;
-            flex-wrap: wrap;
-            font-size: 12px;
-            color: #999;
-        }
-
-        .task-priority {
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-        }
-
-        .priority-high {
-            color: #dc3545;
-        }
-
-        .priority-medium {
-            color: #ffc107;
-        }
-
-        .priority-low {
-            color: #28a745;
-        }
-
-        .task-tag {
-            background: #e9ecef;
-            padding: 2px 8px;
-            border-radius: 12px;
-            font-size: 11px;
-        }
-
-        .task-date {
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-        }
-
+        .task-title { font-weight: bold; }
+        .task-date { color: #28a745; font-size: 12px; margin-top: 5px; }
         .delete-btn {
             background: #dc3545;
-            padding: 8px 16px;
-            font-size: 13px;
-            box-shadow: none;
+            width: auto;
+            padding: 5px 15px;
+            margin-top: 10px;
         }
-
-        .delete-btn:hover {
-            background: #c82333;
-        }
-
-        .empty-state {
-            text-align: center;
-            padding: 60px;
-            color: #999;
-        }
-
-        .empty-state i {
-            font-size: 48px;
-            margin-bottom: 15px;
-            display: block;
-        }
-
-        /* ===== СТАТИСТИКА ===== */
-        .stats-grid {
+        .stats {
             display: flex;
             justify-content: space-around;
-            margin-top: 30px;
-            padding-top: 30px;
-            border-top: 2px solid #e0e0e0;
-            gap: 20px;
-            flex-wrap: wrap;
-        }
-
-        .stat-card {
-            text-align: center;
-            flex: 1;
-            min-width: 100px;
-        }
-
-        .stat-value {
-            font-size: 32px;
-            font-weight: bold;
-            color: #667eea;
-        }
-
-        .stat-label {
-            font-size: 14px;
-            color: #666;
-            margin-top: 5px;
-        }
-
-        /* ===== КНОПКА ЧАТА ===== */
-        .chat-button {
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: white;
-            font-size: 28px;
-            border: none;
-            cursor: pointer;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-            transition: all 0.3s;
-            z-index: 1000;
-        }
-
-        .chat-button:hover {
-            transform: scale(1.1);
-        }
-
-        /* ===== ОКНО ЧАТА ===== */
-        .chat-window {
-            position: fixed;
-            bottom: 110px;
-            right: 30px;
-            width: 380px;
-            height: 550px;
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
-            display: flex;
-            flex-direction: column;
-            z-index: 1000;
-            overflow: hidden;
-            animation: slideUp 0.3s ease;
-        }
-
-        @keyframes slideUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .chat-window.hidden {
-            display: none;
-        }
-
-        .chat-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 15px 20px;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: white;
-        }
-
-        .chat-header h3 {
-            margin: 0;
-            font-size: 18px;
-        }
-
-        .chat-header button {
-            background: none;
-            border: none;
-            color: white;
-            font-size: 20px;
-            cursor: pointer;
-            padding: 0;
-            width: 30px;
-            height: 30px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .chat-messages {
-            flex: 1;
-            padding: 15px;
-            overflow-y: auto;
-            background: #f8f9fa;
-        }
-
-        .chat-message {
-            margin-bottom: 12px;
-            padding: 10px 14px;
-            border-radius: 12px;
-            max-width: 85%;
-            word-wrap: break-word;
-            animation: slideIn 0.2s ease;
-        }
-
-        .chat-message.user {
-            background: #667eea;
-            color: white;
-            margin-left: auto;
-            border-bottom-right-radius: 4px;
-        }
-
-        .chat-message.ai {
-            background: white;
-            border: 1px solid #e0e0e0;
-            margin-right: auto;
-            border-bottom-left-radius: 4px;
-        }
-
-        .chat-input {
-            display: flex;
-            padding: 15px;
-            border-top: 1px solid #e0e0e0;
-            background: white;
-        }
-
-        .chat-input input {
-            flex: 1;
-            padding: 10px;
-            border: 1px solid #e0e0e0;
-            border-radius: 8px;
-            font-size: 14px;
-        }
-
-        .chat-input input:focus {
-            outline: none;
-            border-color: #667eea;
-        }
-
-        .chat-input button {
-            margin-left: 10px;
-            padding: 10px 18px;
-            background: #667eea;
-            font-size: 14px;
-        }
-
-        /* ===== ФУТЕР ===== */
-        .footer {
-            margin-top: 30px;
+            margin-top: 20px;
             padding-top: 20px;
-            text-align: center;
-            border-top: 1px solid #e0e0e0;
-            color: #999;
-            font-size: 12px;
+            border-top: 1px solid #ddd;
         }
-
-        /* ===== АДАПТИВНОСТЬ ===== */
-        @media (max-width: 768px) {
-            .container {
-                padding: 20px;
-            }
-
-            .chat-window {
-                width: calc(100vw - 40px);
-                right: 20px;
-                height: 500px;
-            }
-
-            .stats-grid {
-                flex-direction: column;
-                align-items: center;
-            }
-
-            .stat-card {
-                min-width: auto;
-            }
+        .stat-value { font-size: 24px; font-weight: bold; color: #667eea; }
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 10px;
         }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .loading { text-align: center; padding: 20px; }
     </style>
 </head>
 <body>
-
-    <!-- Кнопка чата -->
-    <button class="chat-button" onclick="toggleChat()">
-        💬
-    </button>
-
-    <!-- Окно чата -->
-    <div id="chatWindow" class="chat-window hidden">
-        <div class="chat-header">
-            <h3>🤖 AI Ассистент</h3>
-            <button onclick="toggleChat()">✕</button>
-        </div>
-        <div id="chatMessages" class="chat-messages">
-            <div class="chat-message ai">
-                Привет! Я AI ассистент. 🤗<br>
-                Я могу:<br>
-                • Помочь создать задачу из текста<br>
-                • Дать совет по планированию<br>
-                • Проанализировать продуктивность<br><br>
-                Чем могу помочь?
-            </div>
-        </div>
-        <div class="chat-input">
-            <input type="text" id="chatInput" placeholder="Напишите сообщение..." onkeypress="if(event.key==='Enter') sendChatMessage()">
-            <button onclick="sendChatMessage()">📤</button>
-        </div>
-    </div>
-
     <div class="container">
-        <!-- Заголовок -->
-        <h1>
-            <span class="ai-icon">🤖 AI Task Planner</span>
-        </h1>
-        <div class="subtitle">Умный планировщик задач с искусственным интеллектом</div>
-
-        <!-- Статус -->
-        <div id="status" class="status offline">
-            🔄 Проверка соединения с сервером...
-        </div>
-
-        <!-- Ввод задачи -->
-        <div class="input-section">
-            <textarea id="taskInput" rows="3" 
-                placeholder="Опишите задачу естественным языком...&#10;&#10;Примеры:&#10;• Завтра в 15:00 важное совещание по диплому&#10;• Купить продукты после работы&#10;• Срочный отчет к пятнице"></textarea>
-            
-            <div class="button-group">
-                <button onclick="processTask()">
-                    ✨ Обработать с помощью AI
-                </button>
-                <button onclick="clearInput()" class="btn-secondary">
-                    🗑️ Очистить
-                </button>
-            </div>
-
-            <!-- Примеры -->
-            <div class="examples">
-                <button class="example-btn" onclick="setExample(0)">📅 Совещание по диплому</button>
-                <button class="example-btn" onclick="setExample(1)">📞 Позвонить маме</button>
-                <button class="example-btn" onclick="setExample(2)">🛒 Купить продукты</button>
-                <button class="example-btn" onclick="setExample(3)">⚠️ Срочный отчет</button>
-                <button class="example-btn" onclick="setExample(4)">🏋️ Тренировка в пятницу</button>
-                <button class="example-btn" onclick="setExample(5)">💼 Встреча с клиентом</button>
-            </div>
-        </div>
-
-        <!-- Результат AI -->
-        <div id="result"></div>
-
-        <!-- Задачи -->
-        <div class="tasks-header">
-            <h2>📋 Мои задачи</h2>
-            <div class="task-stats">
-                <span class="stat-badge" id="taskCount">0 задач</span>
-            </div>
-        </div>
-
-        <div id="tasksContainer" class="tasks-container">
-            <div class="empty-state">
-                <i>✨</i>
-                <p>Нет задач. Создайте первую с помощью AI!</p>
-            </div>
-        </div>
-
-        <!-- Статистика -->
-        <div class="stats-grid">
-            <div class="stat-card">
-                <div class="stat-value" id="totalCount">0</div>
-                <div class="stat-label">Всего задач</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-value" id="activeCount">0</div>
-                <div class="stat-label">Активных</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-value" id="completedCount">0</div>
-                <div class="stat-label">Выполнено</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-value" id="completionRate">0%</div>
-                <div class="stat-label">Прогресс</div>
-            </div>
-        </div>
-
-        <!-- Футер -->
-        <div class="footer">
-            <p>Дипломный проект | AI Task Planner с интеграцией Yandex GPT</p>
+        <h1>🤖 AI Task Planner</h1>
+        <div class="subtitle">Опишите задачу - AI создаст структуру</div>
+        
+        <textarea id="taskInput" rows="3" placeholder="Например: Завтра в 15:00 важное совещание по диплому"></textarea>
+        
+        <button id="processBtn" onclick="processTask()">✨ Обработать с помощью AI</button>
+        
+        <div id="result" style="margin-top: 20px;"></div>
+        
+        <h2 style="margin-top: 30px;">📋 Мои задачи</h2>
+        <div id="tasks"></div>
+        
+        <div class="stats">
+            <div><div class="stat-value" id="totalCount">0</div><div>Всего</div></div>
+            <div><div class="stat-value" id="completedCount">0</div><div>Выполнено</div></div>
         </div>
     </div>
 
     <script>
-        // ===== ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ =====
         let tasks = JSON.parse(localStorage.getItem('tasks') || '[]');
-        let chatHistory = [];
-        const API_URL = 'http://localhost:5000';
-
-        // ===== ИНИЦИАЛИЗАЦИЯ =====
-        function init() {
-            renderTasks();
-            updateStats();
-            checkConnection();
-            setInterval(checkConnection, 30000);
-        }
-
-        // ===== ПРОВЕРКА СОЕДИНЕНИЯ =====
-        async function checkConnection() {
-            const statusDiv = document.getElementById('status');
-            try {
-                const response = await fetch(`${API_URL}/api/ai/status`);
-                if (response.ok) {
-                    const data = await response.json();
-                    if (data.is_real_ai) {
-                        statusDiv.innerHTML = '✅ AI работает в реальном режиме (Yandex GPT)';
-                    } else {
-                        statusDiv.innerHTML = '🎭 Демо-режим (имитация AI)';
-                    }
-                    statusDiv.className = 'status online';
-                } else {
-                    throw new Error();
-                }
-            } catch (error) {
-                statusDiv.innerHTML = '⚠️ Офлайн-режим (сервер не доступен)';
-                statusDiv.className = 'status offline';
-            }
-        }
-
-        // ===== ОБРАБОТКА ЗАДАЧИ ЧЕРЕЗ AI =====
-        async function processTask() {
-            const text = document.getElementById('taskInput').value.trim();
-            
-            if (!text) {
-                showNotification('Пожалуйста, введите описание задачи', 'error');
+        
+        function renderTasks() {
+            const container = document.getElementById('tasks');
+            if (tasks.length === 0) {
+                container.innerHTML = '<div style="text-align:center;color:#999;padding:40px;">Нет задач</div>';
                 return;
             }
-
-            const resultDiv = document.getElementById('result');
-            resultDiv.innerHTML = `
-                <div class="ai-thinking">
-                    <div class="spinner"></div>
-                    <p style="margin-top: 15px;">🤔 AI анализирует задачу...</p>
+            
+            container.innerHTML = tasks.map(task => `
+                <div class="task">
+                    <div class="task-title">${escapeHtml(task.title)}</div>
+                    <div class="task-date">${task.due_date_display || 'Без срока'}</div>
+                    <div style="font-size:12px;color:#666;">Приоритет: ${task.priority} | Теги: ${task.tags.join(', ')}</div>
+                    <div style="display:flex; gap:10px; margin-top:10px;">
+                        <input type="checkbox" ${task.completed ? 'checked' : ''} onchange="toggleTask(${task.id})">
+                        <button class="delete-btn" onclick="deleteTask(${task.id})">Удалить</button>
+                    </div>
                 </div>
-            `;
-
+            `).join('');
+        }
+        
+        function toggleTask(id) {
+            const task = tasks.find(t => t.id === id);
+            if (task) {
+                task.completed = !task.completed;
+                localStorage.setItem('tasks', JSON.stringify(tasks));
+                renderTasks();
+                updateStats();
+            }
+        }
+        
+        function deleteTask(id) {
+            tasks = tasks.filter(t => t.id !== id);
+            localStorage.setItem('tasks', JSON.stringify(tasks));
+            renderTasks();
+            updateStats();
+        }
+        
+        function updateStats() {
+            document.getElementById('totalCount').textContent = tasks.length;
+            document.getElementById('completedCount').textContent = tasks.filter(t => t.completed).length;
+        }
+        
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        async function processTask() {
+            const text = document.getElementById('taskInput').value.trim();
+            if (!text) {
+                alert('Введите описание задачи');
+                return;
+            }
+            
+            const resultDiv = document.getElementById('result');
+            const processBtn = document.getElementById('processBtn');
+            
+            processBtn.disabled = true;
+            resultDiv.innerHTML = '<div class="loading"><div class="spinner"></div>🤔 AI анализирует...</div>';
+            
+            console.log("📤 Отправка запроса:", text);
+            
             try {
-                const response = await fetch(`${API_URL}/api/ai/process`, {
+                const response = await fetch('http://localhost:5000/api/ai/process', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ text: text })
                 });
-
+                
+                console.log("📥 Статус ответа:", response.status);
+                
                 const data = await response.json();
-
+                console.log("📥 Данные ответа:", data);
+                
                 if (data.success) {
                     const result = data.result;
                     
                     const newTask = {
                         id: Date.now(),
                         title: result.title || text.substring(0, 50),
-                        description: result.description,
-                        completed: false,
-                        priority: result.priority || 'medium',
-                        tags: result.tags || ['общее'],
                         due_date: result.due_date,
-                        created_at: new Date().toISOString(),
+                        due_date_display: result.due_date_display,
+                        priority: result.priority || 'medium',
+                        tags: result.tags || ['задача'],
+                        completed: false,
                         created: new Date().toLocaleString()
                     };
-
+                    
                     tasks.unshift(newTask);
-                    saveTasks();
-
+                    localStorage.setItem('tasks', JSON.stringify(tasks));
+                    
                     resultDiv.innerHTML = `
-                        <div class="result-card">
-                            <strong>✅ Задача создана!</strong><br>
-                            📝 <strong>${escapeHtml(newTask.title)}</strong><br>
-                            ⚠️ Приоритет: ${getPriorityText(newTask.priority)}<br>
-                            🏷️ Теги: ${newTask.tags.map(t => '#' + t).join(', ')}<br>
-                            ${newTask.due_date ? `📅 Срок: ${new Date(newTask.due_date).toLocaleString()}` : ''}
-                            ${data.is_real_ai ? '<br>🤖 Обработано реальным AI (Yandex GPT)' : '<br>🎭 Демо-режим AI'}
+                        <div style="background:#d4edda;padding:15px;border-radius:10px;">
+                            ✅ Задача создана!<br>
+                            📝 ${newTask.title}<br>
+                            📅 ${newTask.due_date_display || 'Без срока'}<br>
+                            🏷️ ${newTask.tags.join(', ')}
                         </div>
                     `;
-
+                    
                     document.getElementById('taskInput').value = '';
                     renderTasks();
                     updateStats();
-
-                    setTimeout(() => {
-                        resultDiv.innerHTML = '';
-                    }, 4000);
-                } else {
-                    throw new Error(data.error || 'Ошибка обработки');
-                }
-            } catch (error) {
-                console.error('Ошибка:', error);
-                resultDiv.innerHTML = `
-                    <div class="error-card">
-                        <strong>❌ Ошибка обработки</strong><br>
-                        ${error.message}<br>
-                        Попробуйте позже или используйте офлайн-режим.
-                    </div>
-                `;
-                setTimeout(() => {
-                    resultDiv.innerHTML = '';
-                }, 3000);
-            }
-        }
-
-        // ===== ОТОБРАЖЕНИЕ ЗАДАЧ =====
-        function renderTasks() {
-            const container = document.getElementById('tasksContainer');
-            
-            if (tasks.length === 0) {
-                container.innerHTML = `
-                    <div class="empty-state">
-                        <i>✨</i>
-                        <p>Нет задач. Создайте первую с помощью AI!</p>
-                    </div>
-                `;
-                return;
-            }
-
-            container.innerHTML = tasks.map(task => `
-                <div class="task-item ${task.completed ? 'completed' : ''}" data-id="${task.id}">
-                    <input type="checkbox" class="task-checkbox" ${task.completed ? 'checked' : ''} 
-                           onchange="toggleTask(${task.id})">
-                    <div class="task-content">
-                        <div class="task-title">${escapeHtml(task.title)}</div>
-                        <div class="task-meta">
-                            <span class="task-priority">
-                                ${getPriorityIcon(task.priority)}
-                                <span class="priority-${task.priority}">${getPriorityText(task.priority)}</span>
-                            </span>
-                            ${task.tags ? task.tags.map(tag => `<span class="task-tag">#${escapeHtml(tag)}</span>`).join('') : ''}
-                            <span class="task-date">📅 ${task.created || 'недавно'}</span>
-                        </div>
-                    </div>
-                    <button class="delete-btn" onclick="deleteTask(${task.id})">🗑️ Удалить</button>
-                </div>
-            `).join('');
-        }
-
-        // ===== ПЕРЕКЛЮЧЕНИЕ СТАТУСА =====
-        async function toggleTask(id) {
-            const task = tasks.find(t => t.id === id);
-            if (task) {
-                task.completed = !task.completed;
-                saveTasks();
-                renderTasks();
-                updateStats();
-                
-                const action = task.completed ? 'выполнена' : 'возвращена';
-                showNotification(`Задача "${task.title.substring(0, 30)}" ${action}`, 'success');
-            }
-        }
-
-        // ===== УДАЛЕНИЕ ЗАДАЧИ =====
-        async function deleteTask(id) {
-            if (confirm('Удалить задачу?')) {
-                tasks = tasks.filter(t => t.id !== id);
-                saveTasks();
-                renderTasks();
-                updateStats();
-                showNotification('Задача удалена', 'info');
-            }
-        }
-
-        // ===== СОХРАНЕНИЕ В LOCALSTORAGE =====
-        function saveTasks() {
-            localStorage.setItem('tasks', JSON.stringify(tasks));
-        }
-
-        // ===== ОБНОВЛЕНИЕ СТАТИСТИКИ =====
-        function updateStats() {
-            const total = tasks.length;
-            const completed = tasks.filter(t => t.completed).length;
-            const active = total - completed;
-            const rate = total > 0 ? Math.round((completed / total) * 100) : 0;
-
-            document.getElementById('totalCount').textContent = total;
-            document.getElementById('activeCount').textContent = active;
-            document.getElementById('completedCount').textContent = completed;
-            document.getElementById('completionRate').textContent = rate + '%';
-            document.getElementById('taskCount').textContent = total + ' ' + getTaskWord(total);
-        }
-
-        // ===== ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ =====
-        function getPriorityText(priority) {
-            const texts = {
-                'high': 'Высокий',
-                'medium': 'Средний',
-                'low': 'Низкий'
-            };
-            return texts[priority] || 'Средний';
-        }
-
-        function getPriorityIcon(priority) {
-            const icons = {
-                'high': '⚠️',
-                'medium': '📌',
-                'low': '✓'
-            };
-            return icons[priority] || '📌';
-        }
-
-        function getTaskWord(count) {
-            if (count % 10 === 1 && count % 100 !== 11) return 'задача';
-            if ([2, 3, 4].includes(count % 10) && ![12, 13, 14].includes(count % 100)) return 'задачи';
-            return 'задач';
-        }
-
-        function escapeHtml(text) {
-            const div = document.createElement('div');
-            div.textContent = text;
-            return div.innerHTML;
-        }
-
-        function showNotification(message, type = 'info') {
-            const notification = document.createElement('div');
-            notification.style.cssText = `
-                position: fixed;
-                top: 20px;
-                right: 20px;
-                padding: 12px 20px;
-                background: ${type === 'success' ? '#28a745' : type === 'error' ? '#dc3545' : '#17a2b8'};
-                color: white;
-                border-radius: 8px;
-                z-index: 2000;
-                animation: slideIn 0.3s ease;
-                box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-            `;
-            notification.textContent = message;
-            document.body.appendChild(notification);
-            
-            setTimeout(() => {
-                notification.style.animation = 'slideOut 0.3s ease';
-                setTimeout(() => notification.remove(), 300);
-            }, 3000);
-        }
-
-        function clearInput() {
-            document.getElementById('taskInput').value = '';
-            showNotification('Поле очищено', 'info');
-        }
-
-        function setExample(index) {
-            const examples = [
-                "Завтра в 15:00 важное совещание по диплому",
-                "Каждую среду звонить маме",
-                "Купить продукты после работы",
-                "Срочный отчет к пятнице",
-                "Тренировка в спортзале в субботу в 10 утра",
-                "Встреча с клиентом в понедельник в 14:00"
-            ];
-            document.getElementById('taskInput').value = examples[index];
-            showNotification('Пример загружен', 'info');
-        }
-
-        // ===== ЧАТ С AI =====
-        async function toggleChat() {
-            const chatWindow = document.getElementById('chatWindow');
-            chatWindow.classList.toggle('hidden');
-        }
-
-        async function sendChatMessage() {
-            const input = document.getElementById('chatInput');
-            const message = input.value.trim();
-            
-            if (!message) return;
-            
-            addChatMessage(message, 'user');
-            input.value = '';
-            
-            addChatMessage('✍️ Печатает...', 'ai', true);
-            
-            try {
-                const response = await fetch(`${API_URL}/api/ai/chat`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ 
-                        message: message,
-                        history: chatHistory 
-                    })
-                });
-                
-                const data = await response.json();
-                
-                // Удаляем индикатор печати
-                const messagesDiv = document.getElementById('chatMessages');
-                const typingMsg = messagesDiv.querySelector('.typing-indicator');
-                if (typingMsg) typingMsg.remove();
-                
-                if (data.success) {
-                    addChatMessage(data.response, 'ai');
-                    chatHistory.push(
-                        { role: 'user', text: message },
-                        { role: 'assistant', text: data.response }
-                    );
                     
-                    if (chatHistory.length > 20) {
-                        chatHistory = chatHistory.slice(-20);
-                    }
+                    setTimeout(() => resultDiv.innerHTML = '', 3000);
                 } else {
-                    addChatMessage('Извините, произошла ошибка. Попробуйте позже.', 'ai');
+                    throw new Error(data.error || 'Ошибка');
                 }
             } catch (error) {
-                const messagesDiv = document.getElementById('chatMessages');
-                const typingMsg = messagesDiv.querySelector('.typing-indicator');
-                if (typingMsg) typingMsg.remove();
-                addChatMessage('Ошибка соединения с сервером. Проверьте, запущен ли бэкенд.', 'ai');
+                console.error("❌ Ошибка:", error);
+                resultDiv.innerHTML = `
+                    <div style="background:#f8d7da;padding:15px;border-radius:10px;">
+                        ❌ Ошибка: ${error.message}<br>
+                        Проверьте консоль (F12) для деталей
+                    </div>
+                `;
+            } finally {
+                processBtn.disabled = false;
             }
         }
-
-        function addChatMessage(text, sender, isTyping = false) {
-            const messagesDiv = document.getElementById('chatMessages');
-            const messageDiv = document.createElement('div');
-            messageDiv.className = `chat-message ${sender}`;
-            if (isTyping) messageDiv.classList.add('typing-indicator');
-            messageDiv.innerHTML = text.replace(/\n/g, '<br>');
-            messagesDiv.appendChild(messageDiv);
-            messagesDiv.scrollTop = messagesDiv.scrollHeight;
-        }
-
-        // ===== ЗАПУСК =====
-        init();
+        
+        renderTasks();
+        updateStats();
     </script>
 </body>
 </html>
