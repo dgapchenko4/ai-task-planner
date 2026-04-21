@@ -2,8 +2,8 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Task Planner - Календарь задач</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>AI Task Planner - Умный планировщик задач</title>
     <style>
         * {
             margin: 0;
@@ -15,35 +15,54 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
-            padding: 20px;
+            height: 100vh;
+            overflow: hidden;
         }
 
-        /* Главный контейнер с двумя колонками */
+        /* Главный контейнер на весь экран */
         .app-container {
-            max-width: 1400px;
-            margin: 0 auto;
-            display: grid;
-            grid-template-columns: 400px 1fr;
-            gap: 20px;
+            display: flex;
+            height: 100vh;
+            width: 100vw;
+            gap: 0;
+            overflow: hidden;
         }
 
-        /* Левая колонка - создание задач */
+        /* Левая панель - фиксированная ширина */
         .left-panel {
+            width: 380px;
             background: white;
-            border-radius: 20px;
-            padding: 25px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            height: fit-content;
-            position: sticky;
-            top: 20px;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 4px 0 20px rgba(0, 0, 0, 0.1);
+            z-index: 10;
+            overflow-y: auto;
+            transition: transform 0.3s ease;
         }
 
-        /* Правая колонка - календарь */
+        /* Правая панель - занимает всё остальное пространство */
         .right-panel {
+            flex: 1;
             background: white;
-            border-radius: 20px;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        /* Содержимое левой панели */
+        .left-content {
             padding: 25px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            flex: 1;
+        }
+
+        /* Содержимое правой панели */
+        .right-content {
+            padding: 25px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
         }
 
         /* Заголовки */
@@ -59,32 +78,35 @@
         .subtitle {
             text-align: center;
             color: #666;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             margin-bottom: 20px;
         }
 
         .section-title {
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             color: #333;
-            margin-bottom: 15px;
+            margin: 20px 0 15px 0;
             padding-bottom: 10px;
             border-bottom: 2px solid #e0e0e0;
             display: flex;
+            justify-content: space-between;
             align-items: center;
-            gap: 10px;
         }
 
         /* Форма ввода */
+        .input-group {
+            margin-bottom: 15px;
+        }
+
         textarea {
             width: 100%;
-            padding: 15px;
+            padding: 12px;
             border: 2px solid #e0e0e0;
             border-radius: 12px;
             font-size: 14px;
             font-family: inherit;
             resize: vertical;
             transition: all 0.3s;
-            margin-bottom: 15px;
         }
 
         textarea:focus {
@@ -113,6 +135,7 @@
         button:disabled {
             opacity: 0.6;
             cursor: not-allowed;
+            transform: none;
         }
 
         /* Примеры */
@@ -129,6 +152,8 @@
             padding: 6px 12px;
             font-size: 11px;
             width: auto;
+            flex: 1;
+            min-width: 80px;
         }
 
         /* Статус */
@@ -150,12 +175,74 @@
             color: #721c24;
         }
 
+        /* Список задач в левой панели */
+        .task-list {
+            max-height: calc(100vh - 480px);
+            overflow-y: auto;
+            min-height: 200px;
+        }
+
+        .task-item {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 12px;
+            margin-bottom: 8px;
+            transition: all 0.3s;
+            border-left: 3px solid #667eea;
+        }
+
+        .task-item:hover {
+            transform: translateX(5px);
+            background: #e9ecef;
+        }
+
+        .task-item.completed {
+            opacity: 0.6;
+            border-left-color: #28a745;
+        }
+
+        .task-title {
+            font-weight: 500;
+            font-size: 13px;
+            margin-bottom: 5px;
+            word-break: break-word;
+        }
+
+        .task-meta {
+            font-size: 10px;
+            color: #999;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .priority-high { color: #dc3545; }
+        .priority-medium { color: #ffc107; }
+        .priority-low { color: #28a745; }
+
+        .task-actions {
+            display: flex;
+            gap: 5px;
+            margin-top: 8px;
+        }
+
+        .task-actions button {
+            width: auto;
+            padding: 4px 10px;
+            font-size: 11px;
+        }
+
+        .delete-btn { background: #dc3545; }
+        .edit-btn { background: #ffc107; color: #333; }
+
         /* Календарь */
         .calendar-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 10px;
         }
 
         .calendar-nav {
@@ -189,6 +276,7 @@
             display: grid;
             grid-template-columns: repeat(7, 1fr);
             gap: 8px;
+            flex: 1;
         }
 
         .calendar-day {
@@ -199,6 +287,8 @@
             cursor: pointer;
             transition: all 0.3s;
             border: 1px solid #e0e0e0;
+            display: flex;
+            flex-direction: column;
         }
 
         .calendar-day:hover {
@@ -223,8 +313,9 @@
         }
 
         .day-tasks {
-            max-height: 70px;
+            flex: 1;
             overflow-y: auto;
+            max-height: 70px;
         }
 
         .day-task {
@@ -234,7 +325,7 @@
             border-radius: 4px;
             font-size: 10px;
             margin-bottom: 2px;
-            cursor: move;
+            cursor: pointer;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
@@ -250,59 +341,7 @@
             transform: scale(1.02);
         }
 
-        /* Список задач в левой панели */
-        .task-list {
-            max-height: 300px;
-            overflow-y: auto;
-        }
-
-        .task-item {
-            background: #f8f9fa;
-            border-radius: 10px;
-            padding: 12px;
-            margin-bottom: 8px;
-            cursor: move;
-            transition: all 0.3s;
-            border-left: 3px solid #667eea;
-        }
-
-        .task-item:hover {
-            transform: translateX(5px);
-            background: #e9ecef;
-        }
-
-        .task-item.completed {
-            opacity: 0.6;
-            border-left-color: #28a745;
-        }
-
-        .task-title {
-            font-weight: 500;
-            font-size: 13px;
-            margin-bottom: 5px;
-        }
-
-        .task-meta {
-            font-size: 10px;
-            color: #999;
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-
-        .priority-high { color: #dc3545; }
-        .priority-medium { color: #ffc107; }
-        .priority-low { color: #28a745; }
-
-        .delete-task-btn {
-            background: #dc3545;
-            padding: 2px 8px;
-            font-size: 10px;
-            width: auto;
-            margin-top: 5px;
-        }
-
-        /* Модальное окно редактирования */
+        /* Модальное окно */
         .modal {
             display: none;
             position: fixed;
@@ -326,6 +365,8 @@
             padding: 30px;
             width: 400px;
             max-width: 90%;
+            max-height: 90%;
+            overflow-y: auto;
         }
 
         .modal-content h3 {
@@ -333,39 +374,34 @@
         }
 
         .modal-content input,
-        .modal-content select {
+        .modal-content select,
+        .modal-content textarea {
             width: 100%;
             padding: 10px;
             margin-bottom: 15px;
             border: 2px solid #e0e0e0;
             border-radius: 8px;
+            font-family: inherit;
         }
 
         .modal-buttons {
             display: flex;
             gap: 10px;
+            margin-top: 20px;
         }
 
-        /* Анимации */
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateY(-20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        /* Результат AI */
+        .result-card {
+            background: #d4edda;
+            padding: 10px;
+            border-radius: 8px;
+            margin: 10px 0;
+            font-size: 12px;
         }
 
-        /* Адаптивность */
-        @media (max-width: 900px) {
-            .app-container {
-                grid-template-columns: 1fr;
-            }
-            .left-panel {
-                position: static;
-            }
+        .loading {
+            text-align: center;
+            padding: 20px;
         }
 
         .spinner {
@@ -383,55 +419,172 @@
             to { transform: rotate(360deg); }
         }
 
-        .loading {
-            text-align: center;
-            padding: 20px;
+        /* Кнопка для мобильного меню */
+        .mobile-menu-btn {
+            display: none;
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 100;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            font-size: 20px;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+
+        /* Адаптивность */
+        @media (max-width: 768px) {
+            .mobile-menu-btn {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .app-container {
+                position: relative;
+            }
+
+            .left-panel {
+                position: fixed;
+                left: 0;
+                top: 0;
+                height: 100vh;
+                width: 280px;
+                transform: translateX(-100%);
+                z-index: 200;
+            }
+
+            .left-panel.open {
+                transform: translateX(0);
+            }
+
+            .right-panel {
+                width: 100%;
+            }
+
+            .right-content {
+                padding: 60px 15px 15px 15px;
+            }
+
+            .calendar-weekdays {
+                font-size: 12px;
+            }
+
+            .calendar-day {
+                min-height: 70px;
+                padding: 4px;
+            }
+
+            .day-number {
+                font-size: 11px;
+            }
+
+            .day-task {
+                font-size: 8px;
+                padding: 1px 4px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .calendar-days {
+                gap: 4px;
+            }
+
+            .calendar-day {
+                min-height: 60px;
+            }
+
+            .current-month {
+                font-size: 1rem;
+            }
+
+            .examples {
+                gap: 5px;
+            }
+
+            .example-btn {
+                font-size: 10px;
+                padding: 4px 8px;
+                min-width: 70px;
+            }
+        }
+
+        /* Стили для скроллбара */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #667eea;
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #5a67d8;
         }
     </style>
 </head>
 <body>
+    <!-- Кнопка для мобильного меню -->
+    <button class="mobile-menu-btn" onclick="toggleMobileMenu()">☰</button>
+
     <div class="app-container">
-        <!-- ЛЕВАЯ КОЛОНКА - СОЗДАНИЕ ЗАДАЧ -->
-        <div class="left-panel">
-            <h1>🤖 AI Task Planner</h1>
-            <div class="subtitle">Создавайте задачи с помощью AI</div>
-            
-            <div id="status" class="status offline">🔄 Проверка соединения...</div>
-            
-            <textarea id="taskInput" rows="3" placeholder="Опишите задачу...&#10;Например: Завтра в 15:00 важное совещание по диплому"></textarea>
-            
-            <button id="processBtn" onclick="processTask()">✨ Создать задачу</button>
-            
-            <div class="examples">
-                <button class="example-btn" onclick="setExample(0)">📅 Завтра совещание</button>
-                <button class="example-btn" onclick="setExample(1)">📞 Позвонить маме</button>
-                <button class="example-btn" onclick="setExample(2)">🛒 Купить продукты</button>
-                <button class="example-btn" onclick="setExample(3)">⚠️ Срочный отчет</button>
+        <!-- ЛЕВАЯ ПАНЕЛЬ -->
+        <div class="left-panel" id="leftPanel">
+            <div class="left-content">
+                <h1>🤖 AI Task Planner</h1>
+                <div class="subtitle">Создавайте задачи с помощью AI</div>
+                
+                <div id="status" class="status offline">🔄 Проверка соединения...</div>
+                
+                <textarea id="taskInput" rows="3" placeholder="Опишите задачу...&#10;Например: Завтра в 15:00 важное совещание по диплому"></textarea>
+                
+                <button id="processBtn" onclick="processTask()">✨ Создать задачу</button>
+                
+                <div class="examples">
+                    <button class="example-btn" onclick="setExample(0)">📅 Завтра совещание</button>
+                    <button class="example-btn" onclick="setExample(1)">📞 Позвонить маме</button>
+                    <button class="example-btn" onclick="setExample(2)">🛒 Купить продукты</button>
+                    <button class="example-btn" onclick="setExample(3)">⚠️ Срочный отчет</button>
+                </div>
+                
+                <div id="result"></div>
+                
+                <div class="section-title">
+                    <span>📋 Список задач</span>
+                    <span style="font-size:12px;" id="taskCount">0</span>
+                </div>
+                
+                <div id="taskList" class="task-list"></div>
             </div>
-            
-            <div id="result" style="margin-top: 15px;"></div>
-            
-            <div class="section-title">
-                <span>📋 Список задач</span>
-                <span style="font-size:12px;" id="taskCount">0</span>
-            </div>
-            
-            <div id="taskList" class="task-list"></div>
         </div>
         
-        <!-- ПРАВАЯ КОЛОНКА - КАЛЕНДАРЬ -->
+        <!-- ПРАВАЯ ПАНЕЛЬ -->
         <div class="right-panel">
-            <div class="calendar-header">
-                <button onclick="prevMonth()">◀</button>
-                <span class="current-month" id="currentMonth"></span>
-                <button onclick="nextMonth()">▶</button>
+            <div class="right-content">
+                <div class="calendar-header">
+                    <button onclick="prevMonth()">◀</button>
+                    <span class="current-month" id="currentMonth"></span>
+                    <button onclick="nextMonth()">▶</button>
+                </div>
+                
+                <div class="calendar-weekdays">
+                    <span>ПН</span><span>ВТ</span><span>СР</span><span>ЧТ</span><span>ПТ</span><span>СБ</span><span>ВС</span>
+                </div>
+                
+                <div id="calendarDays" class="calendar-days"></div>
             </div>
-            
-            <div class="calendar-weekdays">
-                <span>ПН</span><span>ВТ</span><span>СР</span><span>ЧТ</span><span>ПТ</span><span>СБ</span><span>ВС</span>
-            </div>
-            
-            <div id="calendarDays" class="calendar-days"></div>
         </div>
     </div>
     
@@ -467,6 +620,23 @@
             checkConnection();
             setInterval(checkConnection, 30000);
         }
+
+        // ===== МОБИЛЬНОЕ МЕНЮ =====
+        function toggleMobileMenu() {
+            const panel = document.getElementById('leftPanel');
+            panel.classList.toggle('open');
+        }
+
+        // Закрываем меню при клике вне его
+        document.addEventListener('click', function(event) {
+            const panel = document.getElementById('leftPanel');
+            const menuBtn = document.querySelector('.mobile-menu-btn');
+            if (window.innerWidth <= 768 && panel.classList.contains('open')) {
+                if (!panel.contains(event.target) && !menuBtn.contains(event.target)) {
+                    panel.classList.remove('open');
+                }
+            }
+        });
 
         // ===== ПРОВЕРКА СОЕДИНЕНИЯ =====
         async function checkConnection() {
@@ -523,7 +693,7 @@
                     saveTasks();
                     
                     resultDiv.innerHTML = `
-                        <div style="background:#d4edda;padding:10px;border-radius:8px;font-size:12px;">
+                        <div class="result-card">
                             ✅ Задача создана!<br>
                             📝 ${newTask.title.substring(0, 40)}<br>
                             📅 ${newTask.due_date_display || 'Без срока'}
@@ -538,7 +708,7 @@
                     setTimeout(() => resultDiv.innerHTML = '', 2000);
                 }
             } catch (error) {
-                resultDiv.innerHTML = `<div style="background:#f8d7da;padding:10px;border-radius:8px;">❌ Ошибка: ${error.message}</div>`;
+                resultDiv.innerHTML = `<div class="result-card" style="background:#f8d7da;">❌ Ошибка: ${error.message}</div>`;
             } finally {
                 processBtn.disabled = false;
             }
@@ -554,17 +724,16 @@
             }
             
             container.innerHTML = tasks.map(task => `
-                <div class="task-item ${task.completed ? 'completed' : ''}" draggable="true" 
-                     ondragstart="dragStart(event, ${task.id})" ondragend="dragEnd(event)">
+                <div class="task-item ${task.completed ? 'completed' : ''}">
                     <div class="task-title">${escapeHtml(task.title)}</div>
                     <div class="task-meta">
                         <span class="priority-${task.priority}">${getPriorityIcon(task.priority)} ${getPriorityText(task.priority)}</span>
                         <span>📅 ${task.due_date_display || 'Без срока'}</span>
                     </div>
-                    <div style="display:flex; gap:5px; margin-top:8px;">
+                    <div class="task-actions">
                         <input type="checkbox" ${task.completed ? 'checked' : ''} onchange="toggleTask(${task.id})">
-                        <button class="delete-task-btn" onclick="deleteTask(${task.id})">🗑️</button>
-                        <button class="delete-task-btn" onclick="openEditModal(${task.id})" style="background:#ffc107;">✏️</button>
+                        <button class="edit-btn" onclick="openEditModal(${task.id})">✏️</button>
+                        <button class="delete-btn" onclick="deleteTask(${task.id})">🗑️</button>
                     </div>
                 </div>
             `).join('');
@@ -626,6 +795,9 @@
                     taskDiv.onclick = (e) => {
                         e.stopPropagation();
                         openEditModal(task.id);
+                        if (window.innerWidth <= 768) {
+                            document.getElementById('leftPanel').classList.remove('open');
+                        }
                     };
                     dayTasksDiv.appendChild(taskDiv);
                 });
@@ -635,18 +807,6 @@
             }
         }
 
-        // ===== DRAG & DROP ДЛЯ ПЕРЕНОСА ЗАДАЧ =====
-        let draggedTaskId = null;
-        
-        function dragStart(event, taskId) {
-            draggedTaskId = taskId;
-            event.dataTransfer.setData('text/plain', taskId);
-        }
-        
-        function dragEnd(event) {
-            draggedTaskId = null;
-        }
-        
         // ===== ОПЕРАЦИИ С ЗАДАЧАМИ =====
         function toggleTask(id) {
             const task = tasks.find(t => t.id === id);
@@ -755,6 +915,13 @@
             ];
             document.getElementById('taskInput').value = examples[index];
         }
+        
+        // Закрываем модальное окно по Escape
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeModal();
+            }
+        });
         
         // Запуск
         init();
