@@ -1,0 +1,930 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>AI Task Planner - Умный планировщик задач</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Главный контейнер на весь экран */
+        .app-container {
+            display: flex;
+            height: 100vh;
+            width: 100vw;
+            gap: 0;
+            overflow: hidden;
+        }
+
+        /* Левая панель - фиксированная ширина */
+        .left-panel {
+            width: 380px;
+            background: white;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 4px 0 20px rgba(0, 0, 0, 0.1);
+            z-index: 10;
+            overflow-y: auto;
+            transition: transform 0.3s ease;
+        }
+
+        /* Правая панель - занимает всё остальное пространство */
+        .right-panel {
+            flex: 1;
+            background: white;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        /* Содержимое левой панели */
+        .left-content {
+            padding: 25px;
+            flex: 1;
+        }
+
+        /* Содержимое правой панели */
+        .right-content {
+            padding: 25px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+
+        /* Заголовки */
+        h1 {
+            font-size: 1.8rem;
+            text-align: center;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            font-size: 0.85rem;
+            margin-bottom: 20px;
+        }
+
+        .section-title {
+            font-size: 1.1rem;
+            color: #333;
+            margin: 20px 0 15px 0;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e0e0e0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* Форма ввода */
+        .input-group {
+            margin-bottom: 15px;
+        }
+
+        textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            font-size: 14px;
+            font-family: inherit;
+            resize: vertical;
+            transition: all 0.3s;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        button {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            width: 100%;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Примеры */
+        .examples {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin: 15px 0;
+        }
+
+        .example-btn {
+            background: #f0f0f0;
+            color: #333;
+            padding: 6px 12px;
+            font-size: 11px;
+            width: auto;
+            flex: 1;
+            min-width: 80px;
+        }
+
+        /* Статус */
+        .status {
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            text-align: center;
+            font-size: 12px;
+        }
+
+        .status.online {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status.offline {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        /* Список задач в левой панели */
+        .task-list {
+            max-height: calc(100vh - 480px);
+            overflow-y: auto;
+            min-height: 200px;
+        }
+
+        .task-item {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 12px;
+            margin-bottom: 8px;
+            transition: all 0.3s;
+            border-left: 3px solid #667eea;
+        }
+
+        .task-item:hover {
+            transform: translateX(5px);
+            background: #e9ecef;
+        }
+
+        .task-item.completed {
+            opacity: 0.6;
+            border-left-color: #28a745;
+        }
+
+        .task-title {
+            font-weight: 500;
+            font-size: 13px;
+            margin-bottom: 5px;
+            word-break: break-word;
+        }
+
+        .task-meta {
+            font-size: 10px;
+            color: #999;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .priority-high { color: #dc3545; }
+        .priority-medium { color: #ffc107; }
+        .priority-low { color: #28a745; }
+
+        .task-actions {
+            display: flex;
+            gap: 5px;
+            margin-top: 8px;
+        }
+
+        .task-actions button {
+            width: auto;
+            padding: 4px 10px;
+            font-size: 11px;
+        }
+
+        .delete-btn { background: #dc3545; }
+        .edit-btn { background: #ffc107; color: #333; }
+
+        /* Календарь */
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .calendar-nav {
+            display: flex;
+            gap: 10px;
+        }
+
+        .calendar-nav button {
+            width: auto;
+            padding: 8px 15px;
+            background: #f0f0f0;
+            color: #333;
+        }
+
+        .current-month {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .calendar-weekdays {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            text-align: center;
+            margin-bottom: 10px;
+            font-weight: bold;
+            color: #666;
+        }
+
+        .calendar-days {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 8px;
+            flex: 1;
+        }
+
+        .calendar-day {
+            min-height: 100px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 1px solid #e0e0e0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .calendar-day:hover {
+            background: #e9ecef;
+            transform: translateY(-2px);
+        }
+
+        .calendar-day.other-month {
+            background: #f8f9fa;
+            opacity: 0.5;
+        }
+
+        .calendar-day.today {
+            border: 2px solid #667eea;
+            background: #f0f0ff;
+        }
+
+        .day-number {
+            font-weight: bold;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .day-tasks {
+            flex: 1;
+            overflow-y: auto;
+            max-height: 70px;
+        }
+
+        .day-task {
+            background: #667eea;
+            color: white;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 10px;
+            margin-bottom: 2px;
+            cursor: pointer;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .day-task.completed {
+            background: #28a745;
+            text-decoration: line-through;
+            opacity: 0.7;
+        }
+
+        .day-task:hover {
+            transform: scale(1.02);
+        }
+
+        /* Модальное окно */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            width: 400px;
+            max-width: 90%;
+            max-height: 90%;
+            overflow-y: auto;
+        }
+
+        .modal-content h3 {
+            margin-bottom: 20px;
+        }
+
+        .modal-content input,
+        .modal-content select,
+        .modal-content textarea {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-family: inherit;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        /* Результат AI */
+        .result-card {
+            background: #d4edda;
+            padding: 10px;
+            border-radius: 8px;
+            margin: 10px 0;
+            font-size: 12px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 10px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Кнопка для мобильного меню */
+        .mobile-menu-btn {
+            display: none;
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 100;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            font-size: 20px;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+
+        /* Адаптивность */
+        @media (max-width: 768px) {
+            .mobile-menu-btn {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .app-container {
+                position: relative;
+            }
+
+            .left-panel {
+                position: fixed;
+                left: 0;
+                top: 0;
+                height: 100vh;
+                width: 280px;
+                transform: translateX(-100%);
+                z-index: 200;
+            }
+
+            .left-panel.open {
+                transform: translateX(0);
+            }
+
+            .right-panel {
+                width: 100%;
+            }
+
+            .right-content {
+                padding: 60px 15px 15px 15px;
+            }
+
+            .calendar-weekdays {
+                font-size: 12px;
+            }
+
+            .calendar-day {
+                min-height: 70px;
+                padding: 4px;
+            }
+
+            .day-number {
+                font-size: 11px;
+            }
+
+            .day-task {
+                font-size: 8px;
+                padding: 1px 4px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .calendar-days {
+                gap: 4px;
+            }
+
+            .calendar-day {
+                min-height: 60px;
+            }
+
+            .current-month {
+                font-size: 1rem;
+            }
+
+            .examples {
+                gap: 5px;
+            }
+
+            .example-btn {
+                font-size: 10px;
+                padding: 4px 8px;
+                min-width: 70px;
+            }
+        }
+
+        /* Стили для скроллбара */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #667eea;
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #5a67d8;
+        }
+    </style>
+</head>
+<body>
+    <!-- Кнопка для мобильного меню -->
+    <button class="mobile-menu-btn" onclick="toggleMobileMenu()">☰</button>
+
+    <div class="app-container">
+        <!-- ЛЕВАЯ ПАНЕЛЬ -->
+        <div class="left-panel" id="leftPanel">
+            <div class="left-content">
+                <h1>🤖 AI Task Planner</h1>
+                <div class="subtitle">Создавайте задачи с помощью AI</div>
+                
+                <div id="status" class="status offline">🔄 Проверка соединения...</div>
+                
+                <textarea id="taskInput" rows="3" placeholder="Опишите задачу...&#10;Например: Завтра в 15:00 важное совещание по диплому"></textarea>
+                
+                <button id="processBtn" onclick="processTask()">✨ Создать задачу</button>
+                
+                <div class="examples">
+                    <button class="example-btn" onclick="setExample(0)">📅 Завтра совещание</button>
+                    <button class="example-btn" onclick="setExample(1)">📞 Позвонить маме</button>
+                    <button class="example-btn" onclick="setExample(2)">🛒 Купить продукты</button>
+                    <button class="example-btn" onclick="setExample(3)">⚠️ Срочный отчет</button>
+                </div>
+                
+                <div id="result"></div>
+                
+                <div class="section-title">
+                    <span>📋 Список задач</span>
+                    <span style="font-size:12px;" id="taskCount">0</span>
+                </div>
+                
+                <div id="taskList" class="task-list"></div>
+            </div>
+        </div>
+        
+        <!-- ПРАВАЯ ПАНЕЛЬ -->
+        <div class="right-panel">
+            <div class="right-content">
+                <div class="calendar-header">
+                    <button onclick="prevMonth()">◀</button>
+                    <span class="current-month" id="currentMonth"></span>
+                    <button onclick="nextMonth()">▶</button>
+                </div>
+                
+                <div class="calendar-weekdays">
+                    <span>ПН</span><span>ВТ</span><span>СР</span><span>ЧТ</span><span>ПТ</span><span>СБ</span><span>ВС</span>
+                </div>
+                
+                <div id="calendarDays" class="calendar-days"></div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Модальное окно редактирования -->
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <h3>✏️ Редактировать задачу</h3>
+            <input type="text" id="editTitle" placeholder="Название">
+            <input type="datetime-local" id="editDate">
+            <select id="editPriority">
+                <option value="low">Низкий приоритет</option>
+                <option value="medium">Средний приоритет</option>
+                <option value="high">Высокий приоритет</option>
+            </select>
+            <div class="modal-buttons">
+                <button onclick="saveEdit()" style="background:#28a745;">Сохранить</button>
+                <button onclick="closeModal()" style="background:#6c757d;">Отмена</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let tasks = JSON.parse(localStorage.getItem('tasks') || '[]');
+        let currentDate = new Date();
+        let editingTaskId = null;
+        const API_URL = 'http://localhost:5000';
+
+        // ===== ИНИЦИАЛИЗАЦИЯ =====
+        function init() {
+            renderTaskList();
+            renderCalendar();
+            updateStats();
+            checkConnection();
+            setInterval(checkConnection, 30000);
+        }
+
+        // ===== МОБИЛЬНОЕ МЕНЮ =====
+        function toggleMobileMenu() {
+            const panel = document.getElementById('leftPanel');
+            panel.classList.toggle('open');
+        }
+
+        // Закрываем меню при клике вне его
+        document.addEventListener('click', function(event) {
+            const panel = document.getElementById('leftPanel');
+            const menuBtn = document.querySelector('.mobile-menu-btn');
+            if (window.innerWidth <= 768 && panel.classList.contains('open')) {
+                if (!panel.contains(event.target) && !menuBtn.contains(event.target)) {
+                    panel.classList.remove('open');
+                }
+            }
+        });
+
+        // ===== ПРОВЕРКА СОЕДИНЕНИЯ =====
+        async function checkConnection() {
+            try {
+                const response = await fetch(`${API_URL}/api/ai/status`);
+                if (response.ok) {
+                    document.getElementById('status').innerHTML = '✅ AI готов к работе';
+                    document.getElementById('status').className = 'status online';
+                }
+            } catch(e) {
+                document.getElementById('status').innerHTML = '⚠️ Офлайн-режим';
+                document.getElementById('status').className = 'status offline';
+            }
+        }
+
+        // ===== СОЗДАНИЕ ЗАДАЧИ =====
+        async function processTask() {
+            const text = document.getElementById('taskInput').value.trim();
+            if (!text) {
+                alert('Введите описание задачи');
+                return;
+            }
+
+            const resultDiv = document.getElementById('result');
+            const processBtn = document.getElementById('processBtn');
+            
+            processBtn.disabled = true;
+            resultDiv.innerHTML = '<div class="loading"><div class="spinner"></div>🤔 AI анализирует...</div>';
+
+            try {
+                const response = await fetch(`${API_URL}/api/ai/process`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ text: text })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    const result = data.result;
+                    
+                    const newTask = {
+                        id: Date.now(),
+                        title: result.title || text.substring(0, 50),
+                        due_date: result.due_date,
+                        due_date_display: result.due_date_display,
+                        priority: result.priority || 'medium',
+                        tags: result.tags || ['задача'],
+                        completed: false,
+                        created: new Date().toLocaleString()
+                    };
+                    
+                    tasks.unshift(newTask);
+                    saveTasks();
+                    
+                    resultDiv.innerHTML = `
+                        <div class="result-card">
+                            ✅ Задача создана!<br>
+                            📝 ${newTask.title.substring(0, 40)}<br>
+                            📅 ${newTask.due_date_display || 'Без срока'}
+                        </div>
+                    `;
+                    
+                    document.getElementById('taskInput').value = '';
+                    renderTaskList();
+                    renderCalendar();
+                    updateStats();
+                    
+                    setTimeout(() => resultDiv.innerHTML = '', 2000);
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="result-card" style="background:#f8d7da;">❌ Ошибка: ${error.message}</div>`;
+            } finally {
+                processBtn.disabled = false;
+            }
+        }
+
+        // ===== ОТОБРАЖЕНИЕ СПИСКА ЗАДАЧ =====
+        function renderTaskList() {
+            const container = document.getElementById('taskList');
+            
+            if (tasks.length === 0) {
+                container.innerHTML = '<div style="text-align:center;color:#999;padding:20px;">Нет задач</div>';
+                return;
+            }
+            
+            container.innerHTML = tasks.map(task => `
+                <div class="task-item ${task.completed ? 'completed' : ''}">
+                    <div class="task-title">${escapeHtml(task.title)}</div>
+                    <div class="task-meta">
+                        <span class="priority-${task.priority}">${getPriorityIcon(task.priority)} ${getPriorityText(task.priority)}</span>
+                        <span>📅 ${task.due_date_display || 'Без срока'}</span>
+                    </div>
+                    <div class="task-actions">
+                        <input type="checkbox" ${task.completed ? 'checked' : ''} onchange="toggleTask(${task.id})">
+                        <button class="edit-btn" onclick="openEditModal(${task.id})">✏️</button>
+                        <button class="delete-btn" onclick="deleteTask(${task.id})">🗑️</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // ===== КАЛЕНДАРЬ =====
+        function renderCalendar() {
+            const year = currentDate.getFullYear();
+            const month = currentDate.getMonth();
+            
+            const firstDay = new Date(year, month, 1);
+            const startDay = firstDay.getDay();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            
+            document.getElementById('currentMonth').textContent = 
+                `${firstDay.toLocaleString('ru-RU', { month: 'long' })} ${year}`;
+            
+            const calendarDays = document.getElementById('calendarDays');
+            calendarDays.innerHTML = '';
+            
+            // Пустые ячейки для дней предыдущего месяца
+            const prevMonthDays = startDay === 0 ? 6 : startDay - 1;
+            for (let i = 0; i < prevMonthDays; i++) {
+                const emptyDay = document.createElement('div');
+                emptyDay.className = 'calendar-day other-month';
+                calendarDays.appendChild(emptyDay);
+            }
+            
+            // Дни текущего месяца
+            const today = new Date();
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dayDate = new Date(year, month, day);
+                const dayDiv = document.createElement('div');
+                dayDiv.className = 'calendar-day';
+                
+                if (dayDate.toDateString() === today.toDateString()) {
+                    dayDiv.classList.add('today');
+                }
+                
+                const dayNumber = document.createElement('div');
+                dayNumber.className = 'day-number';
+                dayNumber.textContent = day;
+                dayDiv.appendChild(dayNumber);
+                
+                // Задачи на этот день
+                const dayTasksDiv = document.createElement('div');
+                dayTasksDiv.className = 'day-tasks';
+                
+                const dayTasks = tasks.filter(task => {
+                    if (!task.due_date) return false;
+                    const taskDate = new Date(task.due_date);
+                    return taskDate.toDateString() === dayDate.toDateString();
+                });
+                
+                dayTasks.forEach(task => {
+                    const taskDiv = document.createElement('div');
+                    taskDiv.className = `day-task ${task.completed ? 'completed' : ''}`;
+                    taskDiv.textContent = task.title.length > 20 ? task.title.substring(0, 20) + '...' : task.title;
+                    taskDiv.onclick = (e) => {
+                        e.stopPropagation();
+                        openEditModal(task.id);
+                        if (window.innerWidth <= 768) {
+                            document.getElementById('leftPanel').classList.remove('open');
+                        }
+                    };
+                    dayTasksDiv.appendChild(taskDiv);
+                });
+                
+                dayDiv.appendChild(dayTasksDiv);
+                calendarDays.appendChild(dayDiv);
+            }
+        }
+
+        // ===== ОПЕРАЦИИ С ЗАДАЧАМИ =====
+        function toggleTask(id) {
+            const task = tasks.find(t => t.id === id);
+            if (task) {
+                task.completed = !task.completed;
+                saveTasks();
+                renderTaskList();
+                renderCalendar();
+                updateStats();
+            }
+        }
+        
+        function deleteTask(id) {
+            if (confirm('Удалить задачу?')) {
+                tasks = tasks.filter(t => t.id !== id);
+                saveTasks();
+                renderTaskList();
+                renderCalendar();
+                updateStats();
+            }
+        }
+        
+        function openEditModal(id) {
+            const task = tasks.find(t => t.id === id);
+            if (!task) return;
+            
+            editingTaskId = id;
+            document.getElementById('editTitle').value = task.title;
+            document.getElementById('editDate').value = task.due_date ? task.due_date.slice(0, 16) : '';
+            document.getElementById('editPriority').value = task.priority;
+            document.getElementById('editModal').classList.add('active');
+        }
+        
+        function saveEdit() {
+            const task = tasks.find(t => t.id === editingTaskId);
+            if (task) {
+                task.title = document.getElementById('editTitle').value;
+                task.due_date = document.getElementById('editDate').value;
+                task.priority = document.getElementById('editPriority').value;
+                
+                if (task.due_date) {
+                    const date = new Date(task.due_date);
+                    task.due_date_display = date.toLocaleString('ru-RU', {
+                        day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit'
+                    });
+                } else {
+                    task.due_date_display = null;
+                }
+                
+                saveTasks();
+                renderTaskList();
+                renderCalendar();
+                updateStats();
+            }
+            closeModal();
+        }
+        
+        function closeModal() {
+            document.getElementById('editModal').classList.remove('active');
+            editingTaskId = null;
+        }
+        
+        // ===== НАВИГАЦИЯ ПО КАЛЕНДАРЮ =====
+        function prevMonth() {
+            currentDate.setMonth(currentDate.getMonth() - 1);
+            renderCalendar();
+        }
+        
+        function nextMonth() {
+            currentDate.setMonth(currentDate.getMonth() + 1);
+            renderCalendar();
+        }
+        
+        // ===== СОХРАНЕНИЕ И СТАТИСТИКА =====
+        function saveTasks() {
+            localStorage.setItem('tasks', JSON.stringify(tasks));
+        }
+        
+        function updateStats() {
+            document.getElementById('taskCount').textContent = `${tasks.length} задач`;
+        }
+        
+        // ===== ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ =====
+        function getPriorityText(priority) {
+            const texts = { 'high': 'Высокий', 'medium': 'Средний', 'low': 'Низкий' };
+            return texts[priority] || 'Средний';
+        }
+        
+        function getPriorityIcon(priority) {
+            const icons = { 'high': '⚠️', 'medium': '📌', 'low': '✓' };
+            return icons[priority] || '📌';
+        }
+        
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        function setExample(index) {
+            const examples = [
+                "Завтра в 15:00 важное совещание по диплому",
+                "Позвонить маме",
+                "Купить продукты после работы",
+                "Срочный отчет сегодня к 18 часам"
+            ];
+            document.getElementById('taskInput').value = examples[index];
+        }
+        
+        // Закрываем модальное окно по Escape
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeModal();
+            }
+        });
+        
+        // Запуск
+        init();
+    </script>
+</body>
+</html>
