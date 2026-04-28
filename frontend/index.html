@@ -6,7 +6,7 @@
     <title>AI Task Planner - Умный планировщик задач</title>
     <style>
         /* ======================================================================== */
-        /* ОСНОВНЫЕ СТИЛИ - минимальное оформление */
+        /* ОСНОВНЫЕ СТИЛИ */
         /* ======================================================================== */
         
         * {
@@ -31,7 +31,7 @@
             gap: 0;
         }
 
-        /* Левая колонка - фиксированная ширина */
+        /* Левая колонка */
         .left-panel {
             width: 380px;
             background: white;
@@ -43,7 +43,7 @@
             transition: transform 0.3s ease;
         }
 
-        /* Правая колонка - занимает всё остальное место */
+        /* Правая колонка */
         .right-panel {
             flex: 1;
             background: white;
@@ -52,7 +52,6 @@
             overflow: hidden;
         }
 
-        /* Внутренние отступы */
         .left-content { padding: 25px; flex: 1; }
         .right-content { padding: 25px; flex: 1; display: flex; flex-direction: column; height: 100%; overflow-y: auto; }
 
@@ -60,6 +59,88 @@
         .header { text-align: center; margin-bottom: 25px; }
         .header h1 { font-size: 1.8rem; color: #333; margin-bottom: 8px; }
         .header p { color: #666; font-size: 0.85rem; }
+
+        /* ===== АУТЕНТИФИКАЦИЯ ===== */
+        .auth-section {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .auth-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        .auth-tab {
+            flex: 1;
+            background: #f0f0f0;
+            color: #333;
+            margin-top: 0;
+            padding: 10px;
+            font-size: 14px;
+        }
+        .auth-tab.active {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+        .auth-form {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .auth-form input {
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 14px;
+        }
+        .auth-form input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        .auth-btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            margin-top: 5px;
+        }
+
+        /* Панель пользователя */
+        .user-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .user-info {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 12px;
+            text-align: center;
+        }
+        .user-avatar {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 10px;
+            font-size: 30px;
+            color: white;
+        }
+        .user-name {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+        }
+        .user-email {
+            font-size: 12px;
+            color: #666;
+        }
+        .logout-btn {
+            background: #dc3545;
+            margin-top: 0;
+        }
 
         /* Статус подключения */
         .status {
@@ -107,22 +188,6 @@
         button:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4); }
         button:disabled { opacity: 0.6; cursor: not-allowed; }
 
-        /* Быстрые примеры */
-        .examples {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-            margin-top: 12px;
-        }
-        .example-btn {
-            background: #e9ecef;
-            color: #333;
-            padding: 6px 12px;
-            font-size: 11px;
-            width: auto;
-            margin-top: 0;
-        }
-
         /* Результат создания задачи */
         .result-card {
             background: #d4edda;
@@ -142,7 +207,80 @@
             font-size: 13px;
         }
 
-        /* Заголовок списка задач */
+        /* Секция тегов */
+        .tags-section {
+            margin-bottom: 20px;
+        }
+        .tags-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .tags-header h4 {
+            color: #333;
+            font-size: 14px;
+        }
+        .add-tag-btn {
+            width: auto;
+            background: #28a745;
+            padding: 4px 10px;
+            font-size: 11px;
+            margin-top: 0;
+        }
+        .tags-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .tag-item {
+            background: #e9ecef;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .tag-item span {
+            cursor: pointer;
+        }
+        .tag-item .remove-tag {
+            background: none;
+            color: #dc3545;
+            font-size: 12px;
+            padding: 0;
+            width: auto;
+            margin: 0;
+            cursor: pointer;
+        }
+        .tag-item .remove-tag:hover {
+            transform: none;
+            box-shadow: none;
+        }
+        .add-tag-input {
+            display: none;
+            margin-top: 10px;
+        }
+        .add-tag-input.active {
+            display: flex;
+            gap: 8px;
+        }
+        .add-tag-input input {
+            flex: 1;
+            padding: 6px 10px;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            font-size: 12px;
+        }
+        .add-tag-input button {
+            width: auto;
+            padding: 4px 12px;
+            font-size: 11px;
+            margin-top: 0;
+        }
+
+        /* Список задач */
         .section-title {
             font-size: 1.1rem;
             font-weight: 600;
@@ -162,14 +300,12 @@
             font-size: 12px;
         }
 
-        /* Список задач */
         .task-list {
-            max-height: calc(100vh - 500px);
+            max-height: calc(100vh - 550px);
             overflow-y: auto;
             min-height: 200px;
         }
 
-        /* Одна задача */
         .task-item {
             background: #f8f9fa;
             border-radius: 10px;
@@ -186,9 +322,17 @@
         .priority-high { color: #dc3545; }
         .priority-medium { color: #ffc107; }
         .priority-low { color: #28a745; }
-        .task-tag { background: #e9ecef; padding: 2px 8px; border-radius: 12px; font-size: 10px; }
+        .task-tag {
+            background: #e9ecef;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 10px;
+            cursor: pointer;
+        }
+        .task-tag:hover {
+            background: #dee2e6;
+        }
 
-        /* Кнопки действий */
         .task-actions { display: flex; gap: 8px; }
         .task-actions button { width: auto; padding: 5px 12px; font-size: 11px; margin-top: 0; }
         .complete-btn { background: #28a745; }
@@ -196,10 +340,7 @@
 
         .empty-state { text-align: center; color: #999; padding: 30px; font-size: 14px; }
 
-        /* ======================================================================== */
         /* КАЛЕНДАРЬ */
-        /* ======================================================================== */
-        
         .calendar-header {
             display: flex;
             justify-content: space-between;
@@ -297,7 +438,7 @@
         .save-btn { background: #28a745; }
         .cancel-btn { background: #6c757d; }
 
-        /* Кнопка для мобильного меню */
+        /* Мобильное меню */
         .mobile-menu-btn {
             display: none;
             position: fixed;
@@ -315,7 +456,6 @@
             box-shadow: 0 4px 12px rgba(0,0,0,0.3);
         }
 
-        /* Анимации */
         @keyframes slideIn {
             from { opacity: 0; transform: translateY(-10px); }
             to { opacity: 1; transform: translateY(0); }
@@ -333,12 +473,10 @@
         }
         @keyframes spin { to { transform: rotate(360deg); } }
 
-        /* Скроллбар */
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
         ::-webkit-scrollbar-thumb { background: #667eea; border-radius: 10px; }
 
-        /* Адаптивность */
         @media (max-width: 768px) {
             .mobile-menu-btn { display: flex; align-items: center; justify-content: center; }
             .app-container { position: relative; }
@@ -364,51 +502,86 @@
             .calendar-days { gap: 4px; }
             .calendar-day { min-height: 60px; }
             .current-month { font-size: 1rem; }
-            .example-btn { font-size: 10px; padding: 4px 8px; }
         }
     </style>
 </head>
 <body>
-    <!-- Кнопка для мобильного меню -->
     <button class="mobile-menu-btn" onclick="toggleMobileMenu()">☰</button>
 
     <div class="app-container">
-        <!-- ЛЕВАЯ КОЛОНКА - СОЗДАНИЕ ЗАДАЧ -->
+        <!-- ЛЕВАЯ КОЛОНКА -->
         <div class="left-panel" id="leftPanel">
             <div class="left-content">
                 <div class="header">
                     <h1>🤖 AI Task Planner</h1>
-                    <p>Опишите задачу - AI создаст структуру</p>
+                    <p>Умный планировщик с искусственным интеллектом</p>
                 </div>
 
-                <!-- Статус подключения к серверу -->
+                <!-- БЛОК АУТЕНТИФИКАЦИИ -->
+                <div id="authBlock" class="auth-section">
+                    <div class="auth-tabs">
+                        <button class="auth-tab active" onclick="switchAuthTab('login')">🔐 Вход</button>
+                        <button class="auth-tab" onclick="switchAuthTab('register')">📝 Регистрация</button>
+                    </div>
+                    
+                    <form id="loginForm" class="auth-form" onsubmit="login(event)">
+                        <input type="email" id="loginEmail" placeholder="Email" required>
+                        <input type="password" id="loginPassword" placeholder="Пароль" required>
+                        <button type="submit" class="auth-btn">Войти</button>
+                    </form>
+                    
+                    <form id="registerForm" class="auth-form" style="display: none;" onsubmit="register(event)">
+                        <input type="text" id="regUsername" placeholder="Имя пользователя" required>
+                        <input type="email" id="regEmail" placeholder="Email" required>
+                        <input type="password" id="regPassword" placeholder="Пароль" required>
+                        <input type="password" id="regConfirmPassword" placeholder="Подтвердите пароль" required>
+                        <button type="submit" class="auth-btn">Зарегистрироваться</button>
+                    </form>
+                </div>
+
+                <!-- ПАНЕЛЬ ПОЛЬЗОВАТЕЛЯ (скрыта по умолчанию) -->
+                <div id="userPanel" class="user-panel" style="display: none;">
+                    <div class="user-info">
+                        <div class="user-avatar">👤</div>
+                        <div class="user-name" id="userName">Пользователь</div>
+                        <div class="user-email" id="userEmail">user@example.com</div>
+                    </div>
+                    <button class="logout-btn" onclick="logout()">🚪 Выйти</button>
+                </div>
+
+                <!-- СТАТУС СЕРВЕРА -->
                 <div id="status" class="status offline">🔄 Проверка подключения...</div>
 
-                <!-- Форма создания задачи -->
-                <div class="form-card">
-                    <textarea id="taskText" rows="3" placeholder="Например:&#10;• Завтра в 15:00 важное совещание по диплому&#10;• Купить продукты после работы&#10;• Срочный отчет сегодня к 18 часам"></textarea>
-                    
+                <!-- ФОРМА СОЗДАНИЯ ЗАДАЧИ -->
+                <div class="form-card" id="taskFormBlock" style="display: none;">
+                    <textarea id="taskText" rows="3" placeholder="Опишите задачу...&#10;Например: Завтра в 15:00 важное совещание по диплому"></textarea>
                     <button id="createBtn" onclick="createTask()">✨ Создать задачу</button>
-                    
-                    <!-- Быстрые примеры -->
-                    <div class="examples">
-                        <button class="example-btn" onclick="setExample(0)">📅 Завтра совещание</button>
-                        <button class="example-btn" onclick="setExample(1)">📞 Позвонить маме</button>
-                        <button class="example-btn" onclick="setExample(2)">🛒 Купить продукты</button>
-                        <button class="example-btn" onclick="setExample(3)">⚠️ Срочный отчет</button>
+                </div>
+
+                <!-- УПРАВЛЕНИЕ ТЕГАМИ -->
+                <div class="tags-section" id="tagsBlock" style="display: none;">
+                    <div class="tags-header">
+                        <h4>🏷️ Мои теги</h4>
+                        <button class="add-tag-btn" onclick="showAddTagInput()">+ Добавить тег</button>
+                    </div>
+                    <div id="tagsList" class="tags-list"></div>
+                    <div id="addTagInput" class="add-tag-input">
+                        <input type="text" id="newTagName" placeholder="Название тега" maxlength="20">
+                        <button onclick="addTag()">Добавить</button>
+                        <button onclick="hideAddTagInput()" style="background:#6c757d;">Отмена</button>
                     </div>
                 </div>
 
-                <!-- Сюда будет выводиться результат создания -->
+                <!-- РЕЗУЛЬТАТ -->
                 <div id="result" style="display: none;"></div>
 
-                <!-- Список задач -->
+                <!-- СПИСОК ЗАДАЧ -->
                 <div class="section-title">
                     <span>📋 Мои задачи</span>
                     <span id="taskCount" class="task-count">0</span>
                 </div>
                 <div id="tasksList" class="task-list">
-                    <div class="empty-state">✨ Нет задач. Создайте первую!</div>
+                    <div class="empty-state">✨ Войдите в систему, чтобы видеть задачи</div>
                 </div>
             </div>
         </div>
@@ -416,19 +589,14 @@
         <!-- ПРАВАЯ КОЛОНКА - КАЛЕНДАРЬ -->
         <div class="right-panel">
             <div class="right-content">
-                <!-- Управление месяцем -->
                 <div class="calendar-header">
                     <button class="calendar-nav-btn" onclick="prevMonth()">◀</button>
                     <span id="currentMonth" class="current-month"></span>
                     <button class="calendar-nav-btn" onclick="nextMonth()">▶</button>
                 </div>
-                
-                <!-- Дни недели -->
                 <div class="calendar-weekdays">
                     <span>ПН</span><span>ВТ</span><span>СР</span><span>ЧТ</span><span>ПТ</span><span>СБ</span><span>ВС</span>
                 </div>
-                
-                <!-- Сетка календаря -->
                 <div id="calendarDays" class="calendar-days"></div>
             </div>
         </div>
@@ -441,10 +609,14 @@
             <input type="text" id="editTitle" placeholder="Название задачи">
             <input type="datetime-local" id="editDate">
             <select id="editPriority">
-                <option value="low">🟢 Низкий приоритет</option>
-                <option value="medium" selected>🟡 Средний приоритет</option>
-                <option value="high">🔴 Высокий приоритет</option>
+                <option value="low">🟢 Низкий</option>
+                <option value="medium" selected>🟡 Средний</option>
+                <option value="high">🔴 Высокий</option>
             </select>
+            <div id="editTagsContainer" style="margin-bottom: 15px;">
+                <label style="font-size: 12px; color: #666;">Теги:</label>
+                <div id="editTagsList" style="display: flex; flex-wrap: wrap; gap: 5px; margin-top: 5px;"></div>
+            </div>
             <div class="modal-buttons">
                 <button class="save-btn" onclick="saveEdit()">💾 Сохранить</button>
                 <button class="cancel-btn" onclick="closeModal()">❌ Отмена</button>
@@ -454,108 +626,333 @@
 
     <script>
         // ============================================================================
-        // AI TASK PLANNER - ПОЛНАЯ ЛОГИКА ПРИЛОЖЕНИЯ
+        // AI TASK PLANNER - ПОЛНАЯ ЛОГИКА (АУТЕНТИФИКАЦИЯ + ТЕГИ)
         // ============================================================================
         
-        // ----------------------------------------------------------------------------
-        // 1. ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ
-        // ----------------------------------------------------------------------------
-        let tasks = [];                      // Массив с задачами (хранится в памяти)
-        let currentDate = new Date();        // Текущий месяц для календаря
-        let editingTaskId = null;            // ID задачи, которую редактируем
-        const API_URL = 'http://localhost:5000';  // Адрес нашего бэкенда
+        // ----- 1. ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ -----
+        let tasks = [];
+        let currentUser = null;
+        let userTags = ['работа', 'учеба', 'личное', 'покупки', 'здоровье']; // Теги по умолчанию
+        let currentDate = new Date();
+        let editingTaskId = null;
+        const API_URL = 'http://localhost:5000';
+        const STORAGE_KEYS = {
+            users: 'ai_planner_users',
+            currentUser: 'ai_planner_current_user',
+            tasks: 'ai_planner_tasks'
+        };
 
-        // ----------------------------------------------------------------------------
-        // 2. ФОРМАТИРОВАНИЕ ДАТЫ ОТ YANDEX GPT
-        // ----------------------------------------------------------------------------
-        // Yandex GPT возвращает дату в формате "2025-04-27 15:00:00"
-        // Эта функция превращает её в читаемый вид: "Завтра в 15:00"
-        function formatDateFromGPT(dateString) {
-            // Если даты нет - возвращаем "Без срока"
-            if (!dateString || dateString === 'null') {
-                return "Без срока";
-            }
-            
-            try {
-                // Создаём объект Date из строки
-                const date = new Date(dateString);
-                
-                // Если дата невалидна - возвращаем "Без срока"
-                if (isNaN(date.getTime())) {
-                    return "Без срока";
-                }
-                
-                const now = new Date();
-                // Обнуляем время для корректного сравнения дат
-                const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-                const taskDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
-                
-                // Проверяем, сегодня ли задача
-                if (taskDate.getTime() === today.getTime()) {
-                    return `Сегодня в ${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`;
-                }
-                
-                // Проверяем, завтра ли задача
-                const tomorrow = new Date(today);
-                tomorrow.setDate(tomorrow.getDate() + 1);
-                if (taskDate.getTime() === tomorrow.getTime()) {
-                    return `Завтра в ${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`;
-                }
-                
-                // Иначе стандартный формат: "27.04.2025 в 15:00"
-                return date.toLocaleString('ru-RU', {
-                    day: '2-digit',
-                    month: '2-digit',
-                    hour: '2-digit',
-                    minute: '2-digit'
-                });
-            } catch(e) {
-                // Если что-то пошло не так
-                return "Без срока";
+        // ----- 2. ИНИЦИАЛИЗАЦИЯ -----
+        function init() {
+            console.log("🚀 Приложение запущено");
+            loadUsers();
+            checkAutoLogin();
+            checkServer();
+            setInterval(checkServer, 30000);
+        }
+
+        // ----- 3. РАБОТА С ПОЛЬЗОВАТЕЛЯМИ (localStorage) -----
+        function loadUsers() {
+            const users = localStorage.getItem(STORAGE_KEYS.users);
+            if (!users) {
+                // Создаём тестового пользователя для демонстрации
+                const defaultUsers = {
+                    'test@example.com': {
+                        id: 'user1',
+                        username: 'Тестовый пользователь',
+                        email: 'test@example.com',
+                        password: '123456',
+                        tags: ['работа', 'учеба', 'личное', 'покупки', 'здоровье']
+                    }
+                };
+                localStorage.setItem(STORAGE_KEYS.users, JSON.stringify(defaultUsers));
             }
         }
 
-        // ----------------------------------------------------------------------------
-        // 3. ЗАГРУЗКА СОХРАНЁННЫХ ЗАДАЧ
-        // ----------------------------------------------------------------------------
-        function init() {
-            console.log("🚀 Приложение запущено");
+        function saveUsers(users) {
+            localStorage.setItem(STORAGE_KEYS.users, JSON.stringify(users));
+        }
+
+        function getUsers() {
+            return JSON.parse(localStorage.getItem(STORAGE_KEYS.users) || '{}');
+        }
+
+        function checkAutoLogin() {
+            const savedUser = localStorage.getItem(STORAGE_KEYS.currentUser);
+            if (savedUser) {
+                currentUser = JSON.parse(savedUser);
+                userTags = currentUser.tags || ['работа', 'учеба', 'личное', 'покупки', 'здоровье'];
+                loadUserTasks();
+                showUserInterface();
+                renderTags();
+            }
+        }
+
+        // ----- 4. АУТЕНТИФИКАЦИЯ -----
+        function switchAuthTab(tab) {
+            const loginForm = document.getElementById('loginForm');
+            const registerForm = document.getElementById('registerForm');
+            const tabs = document.querySelectorAll('.auth-tab');
             
-            // Загружаем задачи из localStorage (браузерное хранилище)
-            const saved = localStorage.getItem('tasks');
+            tabs.forEach(t => t.classList.remove('active'));
+            
+            if (tab === 'login') {
+                loginForm.style.display = 'flex';
+                registerForm.style.display = 'none';
+                tabs[0].classList.add('active');
+            } else {
+                loginForm.style.display = 'none';
+                registerForm.style.display = 'flex';
+                tabs[1].classList.add('active');
+            }
+        }
+
+        async function login(event) {
+            event.preventDefault();
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            
+            const users = getUsers();
+            const user = users[email];
+            
+            if (user && user.password === password) {
+                currentUser = user;
+                userTags = user.tags || ['работа', 'учеба', 'личное', 'покупки', 'здоровье'];
+                localStorage.setItem(STORAGE_KEYS.currentUser, JSON.stringify(currentUser));
+                loadUserTasks();
+                showUserInterface();
+                renderTags();
+                showNotification('Успешный вход!', 'success');
+            } else {
+                showNotification('Неверный email или пароль', 'error');
+            }
+        }
+
+        async function register(event) {
+            event.preventDefault();
+            const username = document.getElementById('regUsername').value;
+            const email = document.getElementById('regEmail').value;
+            const password = document.getElementById('regPassword').value;
+            const confirmPassword = document.getElementById('regConfirmPassword').value;
+            
+            if (password !== confirmPassword) {
+                showNotification('Пароли не совпадают', 'error');
+                return;
+            }
+            
+            const users = getUsers();
+            if (users[email]) {
+                showNotification('Пользователь с таким email уже существует', 'error');
+                return;
+            }
+            
+            const newUser = {
+                id: 'user_' + Date.now(),
+                username: username,
+                email: email,
+                password: password,
+                tags: ['работа', 'учеба', 'личное', 'покупки', 'здоровье']
+            };
+            
+            users[email] = newUser;
+            saveUsers(users);
+            
+            currentUser = newUser;
+            userTags = newUser.tags;
+            localStorage.setItem(STORAGE_KEYS.currentUser, JSON.stringify(currentUser));
+            loadUserTasks();
+            showUserInterface();
+            renderTags();
+            showNotification('Регистрация успешна!', 'success');
+        }
+
+        function logout() {
+            currentUser = null;
+            userTags = ['работа', 'учеба', 'личное', 'покупки', 'здоровье'];
+            tasks = [];
+            localStorage.removeItem(STORAGE_KEYS.currentUser);
+            localStorage.removeItem(`${STORAGE_KEYS.tasks}_${currentUser?.id}`);
+            showAuthInterface();
+            renderTasks();
+            renderCalendar();
+            updateTaskCount();
+            showNotification('Вы вышли из системы', 'info');
+        }
+
+        function showUserInterface() {
+            document.getElementById('authBlock').style.display = 'none';
+            document.getElementById('userPanel').style.display = 'flex';
+            document.getElementById('taskFormBlock').style.display = 'block';
+            document.getElementById('tagsBlock').style.display = 'block';
+            
+            document.getElementById('userName').textContent = currentUser.username;
+            document.getElementById('userEmail').textContent = currentUser.email;
+        }
+
+        function showAuthInterface() {
+            document.getElementById('authBlock').style.display = 'flex';
+            document.getElementById('userPanel').style.display = 'none';
+            document.getElementById('taskFormBlock').style.display = 'none';
+            document.getElementById('tagsBlock').style.display = 'none';
+            
+            // Очищаем формы
+            document.getElementById('loginEmail').value = '';
+            document.getElementById('loginPassword').value = '';
+            document.getElementById('regUsername').value = '';
+            document.getElementById('regEmail').value = '';
+            document.getElementById('regPassword').value = '';
+            document.getElementById('regConfirmPassword').value = '';
+        }
+
+        // ----- 5. РАБОТА С ТЕГАМИ -----
+        function renderTags() {
+            const container = document.getElementById('tagsList');
+            if (!container) return;
+            
+            container.innerHTML = userTags.map(tag => `
+                <div class="tag-item">
+                    <span>#${escapeHtml(tag)}</span>
+                    <span class="remove-tag" onclick="removeTag('${escapeHtml(tag)}')">×</span>
+                </div>
+            `).join('');
+            
+            // Обновляем теги в задачах при рендере
+            renderTasks();
+        }
+
+        function showAddTagInput() {
+            document.getElementById('addTagInput').classList.add('active');
+            document.getElementById('newTagName').focus();
+        }
+
+        function hideAddTagInput() {
+            document.getElementById('addTagInput').classList.remove('active');
+            document.getElementById('newTagName').value = '';
+        }
+
+        function addTag() {
+            const newTag = document.getElementById('newTagName').value.trim().toLowerCase();
+            if (!newTag) {
+                showNotification('Введите название тега', 'warning');
+                return;
+            }
+            if (userTags.includes(newTag)) {
+                showNotification('Такой тег уже существует', 'warning');
+                return;
+            }
+            if (newTag.length > 20) {
+                showNotification('Тег не должен превышать 20 символов', 'warning');
+                return;
+            }
+            
+            userTags.push(newTag);
+            
+            // Сохраняем теги в профиле пользователя
+            const users = getUsers();
+            if (users[currentUser.email]) {
+                users[currentUser.email].tags = userTags;
+                saveUsers(users);
+                currentUser.tags = userTags;
+                localStorage.setItem(STORAGE_KEYS.currentUser, JSON.stringify(currentUser));
+            }
+            
+            renderTags();
+            hideAddTagInput();
+            showNotification(`Тег "${newTag}" добавлен`, 'success');
+        }
+
+        function removeTag(tagName) {
+            if (confirm(`Удалить тег "${tagName}"?`)) {
+                userTags = userTags.filter(t => t !== tagName);
+                
+                // Удаляем тег из всех задач
+                tasks.forEach(task => {
+                    if (task.tags) {
+                        task.tags = task.tags.filter(t => t !== tagName);
+                    }
+                });
+                
+                // Сохраняем изменения
+                const users = getUsers();
+                if (users[currentUser.email]) {
+                    users[currentUser.email].tags = userTags;
+                    saveUsers(users);
+                    currentUser.tags = userTags;
+                    localStorage.setItem(STORAGE_KEYS.currentUser, JSON.stringify(currentUser));
+                }
+                
+                saveUserTasks();
+                renderTags();
+                renderTasks();
+                renderCalendar();
+                showNotification(`Тег "${tagName}" удалён`, 'info');
+            }
+        }
+
+        // ----- 6. РАБОТА С ЗАДАЧАМИ (персональными) -----
+        function getUserTasksKey() {
+            return `${STORAGE_KEYS.tasks}_${currentUser?.id}`;
+        }
+
+        function loadUserTasks() {
+            if (!currentUser) return;
+            const saved = localStorage.getItem(getUserTasksKey());
             if (saved) {
                 tasks = JSON.parse(saved);
-                // Обновляем отображение дат для каждой задачи
                 tasks.forEach(task => {
                     if (task.due_date && task.due_date !== 'null') {
                         task.due_date_display = formatDateFromGPT(task.due_date);
                     } else {
                         task.due_date_display = "Без срока";
                     }
+                    if (!task.tags) task.tags = [];
                 });
-                console.log(`📦 Загружено ${tasks.length} задач`);
+                console.log(`📦 Загружено ${tasks.length} задач для пользователя ${currentUser.username}`);
+            } else {
+                tasks = [];
             }
-            
-            // Отображаем всё на экране
-            renderTasks();      // Список задач
-            renderCalendar();   // Календарь
-            updateTaskCount();  // Счётчик задач
-            checkServer();      // Проверка соединения с сервером
-            
-            // Проверяем сервер каждые 30 секунд
-            setInterval(checkServer, 30000);
+            renderTasks();
+            renderCalendar();
+            updateTaskCount();
         }
 
-        // ----------------------------------------------------------------------------
-        // 4. ПРОВЕРКА СОЕДИНЕНИЯ С СЕРВЕРОМ
-        // ----------------------------------------------------------------------------
+        function saveUserTasks() {
+            if (!currentUser) return;
+            localStorage.setItem(getUserTasksKey(), JSON.stringify(tasks));
+        }
+
+        // ----- 7. ФОРМАТИРОВАНИЕ ДАТЫ -----
+        function formatDateFromGPT(dateString) {
+            if (!dateString || dateString === 'null') return "Без срока";
+            try {
+                const date = new Date(dateString);
+                if (isNaN(date.getTime())) return "Без срока";
+                
+                const now = new Date();
+                const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+                const taskDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+                
+                if (taskDate.getTime() === today.getTime()) {
+                    return `Сегодня в ${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`;
+                }
+                const tomorrow = new Date(today);
+                tomorrow.setDate(tomorrow.getDate() + 1);
+                if (taskDate.getTime() === tomorrow.getTime()) {
+                    return `Завтра в ${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`;
+                }
+                return date.toLocaleString('ru-RU', {
+                    day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit'
+                });
+            } catch(e) {
+                return "Без срока";
+            }
+        }
+
+        // ----- 8. ПРОВЕРКА СЕРВЕРА -----
         async function checkServer() {
             const statusDiv = document.getElementById('status');
-            
             try {
-                // Отправляем GET-запрос на проверку статуса
                 const response = await fetch(`${API_URL}/api/ai/status`);
-                
                 if (response.ok) {
                     const data = await response.json();
                     const aiText = data.is_real_ai ? '🤖 Yandex GPT' : '🎭 Демо-режим';
@@ -572,14 +969,14 @@
             }
         }
 
-        // ----------------------------------------------------------------------------
-        // 5. СОЗДАНИЕ НОВОЙ ЗАДАЧИ ЧЕРЕЗ YANDEX GPT
-        // ----------------------------------------------------------------------------
+        // ----- 9. СОЗДАНИЕ ЗАДАЧИ -----
         async function createTask() {
-            // Получаем текст из текстового поля
-            const text = document.getElementById('taskText').value.trim();
+            if (!currentUser) {
+                showNotification('Войдите в систему', 'warning');
+                return;
+            }
             
-            // Проверка: текст не должен быть пустым
+            const text = document.getElementById('taskText').value.trim();
             if (!text) {
                 alert('Введите описание задачи');
                 return;
@@ -587,52 +984,45 @@
             
             console.log("📤 Отправка на сервер:", text);
             
-            // Показываем индикатор загрузки
             const resultDiv = document.getElementById('result');
             resultDiv.style.display = 'block';
             resultDiv.innerHTML = '<div class="loading"><div class="spinner"></div>🤔 AI анализирует...</div>';
             
-            // Блокируем кнопку, чтобы нельзя было нажать повторно
             const btn = document.getElementById('createBtn');
             btn.disabled = true;
             
             try {
-                // Отправляем POST-запрос на сервер с текстом задачи
                 const response = await fetch(`${API_URL}/api/ai/process`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ text: text })
                 });
                 
-                // Получаем ответ от сервера
                 const data = await response.json();
                 console.log("📥 Данные от сервера:", data);
                 
-                // Проверяем, что сервер вернул успешный ответ
                 if (data.success && data.task) {
-                    // Форматируем дату через нашу функцию
                     const displayDate = formatDateFromGPT(data.task.due_date);
                     
-                    // Создаём объект новой задачи
+                    // Фильтруем теги, оставляя только существующие в userTags
+                    let tagsFromAI = data.task.tags || [];
+                    const validTags = tagsFromAI.filter(tag => userTags.includes(tag));
+                    
                     const newTask = {
-                        id: data.task.id || Date.now(),           // Уникальный ID
-                        title: data.task.title,                   // Название
-                        due_date: data.task.due_date || null,     // Дата в формате ISO
-                        due_date_display: displayDate,            // Красивая дата
-                        priority: data.task.priority || 'medium', // Приоритет
-                        tags: data.task.tags || ['задача'],       // Теги
-                        completed: false,                         // Не выполнена
-                        created: new Date().toLocaleString()      // Время создания
+                        id: Date.now(),
+                        title: data.task.title,
+                        due_date: data.task.due_date || null,
+                        due_date_display: displayDate,
+                        priority: data.task.priority || 'medium',
+                        tags: validTags,
+                        completed: false,
+                        created: new Date().toLocaleString()
                     };
                     
-                    // Добавляем задачу в начало списка
                     tasks.unshift(newTask);
+                    saveUserTasks();
                     
-                    // Сохраняем в localStorage
-                    localStorage.setItem('tasks', JSON.stringify(tasks));
-                    
-                    // Показываем результат пользователю
-                    const aiBadge = data.is_real_ai ? '🤖 Обработано Yandex GPT' : '🎭 Демо-режим (встроенный парсер)';
+                    const aiBadge = data.is_real_ai ? '🤖 Обработано Yandex GPT' : '🎭 Демо-режим';
                     
                     resultDiv.innerHTML = `
                         <div class="result-card">
@@ -645,94 +1035,90 @@
                         </div>
                     `;
                     
-                    // Очищаем поле ввода
                     document.getElementById('taskText').value = '';
-                    
-                    // Обновляем интерфейс
                     renderTasks();
                     renderCalendar();
                     updateTaskCount();
                     
-                    // Скрываем сообщение через 4 секунды
                     setTimeout(() => {
                         resultDiv.style.display = 'none';
-                        resultDiv.innerHTML = '';
                     }, 4000);
                 } else {
                     throw new Error(data.error || 'Ошибка от сервера');
                 }
-                
             } catch(error) {
                 console.error("❌ Ошибка:", error);
                 resultDiv.innerHTML = `
                     <div class="error-card">
                         ❌ Ошибка: ${error.message}<br>
-                        Проверьте, запущен ли сервер (cd backend && python3 app.py)
+                        Проверьте, запущен ли сервер
                     </div>
                 `;
             } finally {
-                // Разблокируем кнопку
                 btn.disabled = false;
             }
         }
 
-        // ----------------------------------------------------------------------------
-        // 6. ОТОБРАЖЕНИЕ СПИСКА ЗАДАЧ
-        // ----------------------------------------------------------------------------
+        // ----- 10. ОТОБРАЖЕНИЕ ЗАДАЧ -----
         function renderTasks() {
             const container = document.getElementById('tasksList');
+            if (!currentUser) {
+                container.innerHTML = '<div class="empty-state">✨ Войдите в систему, чтобы видеть задачи</div>';
+                return;
+            }
             
-            // Если задач нет - показываем пустое состояние
             if (tasks.length === 0) {
                 container.innerHTML = '<div class="empty-state">✨ Нет задач. Создайте первую!</div>';
                 return;
             }
             
-            // Создаём HTML для каждой задачи
-            container.innerHTML = tasks.map(task => {
-                return `
-                    <div class="task-item ${task.completed ? 'completed' : ''}">
-                        <div class="task-title">${escapeHtml(task.title)}</div>
-                        <div class="task-meta">
-                            <span class="priority-${task.priority}">
-                                ${getPriorityIcon(task.priority)} ${getPriorityText(task.priority)}
-                            </span>
-                            <span>📅 ${task.due_date_display || "Без срока"}</span>
-                            <span>🏷️ ${task.tags.map(t => '#' + t).join(' ')}</span>
-                        </div>
-                        <div class="task-actions">
-                            <button class="complete-btn" onclick="toggleTask(${task.id})">
-                                ${task.completed ? '↩️ Вернуть' : '✅ Выполнить'}
-                            </button>
-                            <button class="delete-btn" onclick="deleteTask(${task.id})">🗑️ Удалить</button>
-                        </div>
+            container.innerHTML = tasks.map(task => `
+                <div class="task-item ${task.completed ? 'completed' : ''}">
+                    <div class="task-title">${escapeHtml(task.title)}</div>
+                    <div class="task-meta">
+                        <span class="priority-${task.priority}">
+                            ${getPriorityIcon(task.priority)} ${getPriorityText(task.priority)}
+                        </span>
+                        <span>📅 ${task.due_date_display || "Без срока"}</span>
+                        <span>🏷️ ${task.tags.map(t => `<span class="task-tag" onclick="addTagToTask(${task.id}, '${escapeHtml(t)}')">#${escapeHtml(t)}</span>`).join(' ')}</span>
                     </div>
-                `;
-            }).join('');
+                    <div class="task-actions">
+                        <button class="complete-btn" onclick="toggleTask(${task.id})">
+                            ${task.completed ? '↩️ Вернуть' : '✅ Выполнить'}
+                        </button>
+                        <button class="delete-btn" onclick="deleteTask(${task.id})">🗑️ Удалить</button>
+                    </div>
+                </div>
+            `).join('');
         }
 
-        // ----------------------------------------------------------------------------
-        // 7. ПЕРЕКЛЮЧЕНИЕ СТАТУСА ВЫПОЛНЕНИЯ
-        // ----------------------------------------------------------------------------
+        function addTagToTask(taskId, tagName) {
+            const task = tasks.find(t => t.id === taskId);
+            if (task && !task.tags.includes(tagName)) {
+                task.tags.push(tagName);
+                saveUserTasks();
+                renderTasks();
+                renderCalendar();
+                showNotification(`Тег #${tagName} добавлен к задаче`, 'info');
+            }
+        }
+
         function toggleTask(id) {
             const task = tasks.find(t => t.id === id);
             if (task) {
                 task.completed = !task.completed;
-                localStorage.setItem('tasks', JSON.stringify(tasks));
+                saveUserTasks();
                 renderTasks();
                 renderCalendar();
                 console.log(`🔄 Задача "${task.title}" ${task.completed ? 'выполнена' : 'возвращена'}`);
             }
         }
 
-        // ----------------------------------------------------------------------------
-        // 8. УДАЛЕНИЕ ЗАДАЧИ
-        // ----------------------------------------------------------------------------
         function deleteTask(id) {
             if (confirm('Удалить задачу?')) {
                 const task = tasks.find(t => t.id === id);
                 tasks = tasks.filter(t => t.id !== id);
-                localStorage.setItem('tasks', JSON.stringify(tasks));
+                saveUserTasks();
                 renderTasks();
                 renderCalendar();
                 updateTaskCount();
@@ -740,26 +1126,21 @@
             }
         }
 
-        // ----------------------------------------------------------------------------
-        // 9. ОТОБРАЖЕНИЕ КАЛЕНДАРЯ
-        // ----------------------------------------------------------------------------
+        // ----- 11. КАЛЕНДАРЬ -----
         function renderCalendar() {
             const year = currentDate.getFullYear();
             const month = currentDate.getMonth();
             
-            // Первый день месяца и количество дней
             const firstDay = new Date(year, month, 1);
-            const startDay = firstDay.getDay(); // 0=воскресенье, 1=понедельник...
+            const startDay = firstDay.getDay();
             const daysInMonth = new Date(year, month + 1, 0).getDate();
             
-            // Заголовок месяца
             document.getElementById('currentMonth').textContent = 
                 `${firstDay.toLocaleString('ru-RU', { month: 'long' })} ${year}`;
             
             const calendarDays = document.getElementById('calendarDays');
             calendarDays.innerHTML = '';
             
-            // Пустые ячейки для дней предыдущего месяца
             const prevMonthDays = startDay === 0 ? 6 : startDay - 1;
             for (let i = 0; i < prevMonthDays; i++) {
                 const emptyDay = document.createElement('div');
@@ -767,29 +1148,24 @@
                 calendarDays.appendChild(emptyDay);
             }
             
-            // Заполняем дни текущего месяца
             const today = new Date();
             for (let day = 1; day <= daysInMonth; day++) {
                 const dayDate = new Date(year, month, day);
                 const dayDiv = document.createElement('div');
                 dayDiv.className = 'calendar-day';
                 
-                // Подсвечиваем сегодняшний день
                 if (dayDate.toDateString() === today.toDateString()) {
                     dayDiv.classList.add('today');
                 }
                 
-                // Номер дня
                 const dayNumber = document.createElement('div');
                 dayNumber.className = 'day-number';
                 dayNumber.textContent = day;
                 dayDiv.appendChild(dayNumber);
                 
-                // Задачи на этот день
                 const dayTasksDiv = document.createElement('div');
                 dayTasksDiv.className = 'day-tasks';
                 
-                // Фильтруем задачи, у которых дата совпадает с текущим днём
                 const dayTasks = tasks.filter(task => {
                     if (!task.due_date || task.due_date === null || task.due_date === 'null') return false;
                     const taskDate = new Date(task.due_date);
@@ -797,7 +1173,6 @@
                     return taskDate.toDateString() === dayDate.toDateString();
                 });
                 
-                // Добавляем каждую задачу в ячейку
                 dayTasks.forEach(task => {
                     const taskDiv = document.createElement('div');
                     taskDiv.className = `day-task ${task.completed ? 'completed' : ''}`;
@@ -806,7 +1181,6 @@
                     taskDiv.onclick = (e) => {
                         e.stopPropagation();
                         openEditModal(task.id);
-                        // На мобильных устройствах закрываем меню
                         if (window.innerWidth <= 768) {
                             document.getElementById('leftPanel').classList.remove('open');
                         }
@@ -819,9 +1193,6 @@
             }
         }
 
-        // ----------------------------------------------------------------------------
-        // 10. НАВИГАЦИЯ ПО КАЛЕНДАРЮ
-        // ----------------------------------------------------------------------------
         function prevMonth() {
             currentDate.setMonth(currentDate.getMonth() - 1);
             renderCalendar();
@@ -832,9 +1203,7 @@
             renderCalendar();
         }
 
-        // ----------------------------------------------------------------------------
-        // 11. РЕДАКТИРОВАНИЕ ЗАДАЧИ
-        // ----------------------------------------------------------------------------
+        // ----- 12. РЕДАКТИРОВАНИЕ -----
         function openEditModal(id) {
             const task = tasks.find(t => t.id === id);
             if (!task) return;
@@ -843,7 +1212,34 @@
             document.getElementById('editTitle').value = task.title;
             document.getElementById('editDate').value = task.due_date ? task.due_date.slice(0, 16) : '';
             document.getElementById('editPriority').value = task.priority;
+            
+            // Отображаем теги для редактирования
+            const editTagsContainer = document.getElementById('editTagsList');
+            editTagsContainer.innerHTML = userTags.map(tag => `
+                <span class="task-tag" style="background: ${task.tags.includes(tag) ? '#667eea' : '#e9ecef'}; color: ${task.tags.includes(tag) ? 'white' : '#333'}; cursor: pointer;" onclick="toggleTagInEdit('${escapeHtml(tag)}')">
+                    #${escapeHtml(tag)}
+                </span>
+            `).join('');
+            
             document.getElementById('editModal').classList.add('active');
+        }
+
+        function toggleTagInEdit(tagName) {
+            const task = tasks.find(t => t.id === editingTaskId);
+            if (task) {
+                if (task.tags.includes(tagName)) {
+                    task.tags = task.tags.filter(t => t !== tagName);
+                } else {
+                    task.tags.push(tagName);
+                }
+                // Обновляем отображение тегов в модальном окне
+                const editTagsContainer = document.getElementById('editTagsList');
+                editTagsContainer.innerHTML = userTags.map(tag => `
+                    <span class="task-tag" style="background: ${task.tags.includes(tag) ? '#667eea' : '#e9ecef'}; color: ${task.tags.includes(tag) ? 'white' : '#333'}; cursor: pointer;" onclick="toggleTagInEdit('${escapeHtml(tag)}')">
+                        #${escapeHtml(tag)}
+                    </span>
+                `).join('');
+            }
         }
         
         function saveEdit() {
@@ -853,17 +1249,17 @@
                 task.due_date = document.getElementById('editDate').value;
                 task.priority = document.getElementById('editPriority').value;
                 
-                // Обновляем отображение даты
                 if (task.due_date) {
                     task.due_date_display = formatDateFromGPT(task.due_date);
                 } else {
                     task.due_date_display = "Без срока";
                 }
                 
-                localStorage.setItem('tasks', JSON.stringify(tasks));
+                saveUserTasks();
                 renderTasks();
                 renderCalendar();
                 updateTaskCount();
+                showNotification('Задача обновлена', 'success');
             }
             closeModal();
         }
@@ -873,16 +1269,11 @@
             editingTaskId = null;
         }
 
-        // ----------------------------------------------------------------------------
-        // 12. ОБНОВЛЕНИЕ СЧЁТЧИКА ЗАДАЧ
-        // ----------------------------------------------------------------------------
         function updateTaskCount() {
             document.getElementById('taskCount').textContent = tasks.length;
         }
 
-        // ----------------------------------------------------------------------------
-        // 13. ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ
-        // ----------------------------------------------------------------------------
+        // ----- 13. ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ -----
         function getPriorityText(priority) {
             const texts = { 'high': 'Высокий', 'medium': 'Средний', 'low': 'Низкий' };
             return texts[priority] || 'Средний';
@@ -893,7 +1284,6 @@
             return icons[priority] || '🟡';
         }
 
-        // Защита от XSS-атак (безопасное отображение текста)
         function escapeHtml(text) {
             if (!text) return '';
             const div = document.createElement('div');
@@ -901,23 +1291,24 @@
             return div.innerHTML;
         }
 
-        // Быстрые примеры для тестирования
-        function setExample(index) {
-            const examples = [
-                "Завтра в 15:00 важное совещание по диплому",
-                "Позвонить маме",
-                "Купить продукты после работы",
-                "Срочный отчет сегодня к 18 часам"
-            ];
-            document.getElementById('taskText').value = examples[index];
+        function showNotification(message, type) {
+            const resultDiv = document.getElementById('result');
+            resultDiv.style.display = 'block';
+            resultDiv.innerHTML = `
+                <div class="${type === 'error' ? 'error-card' : 'result-card'}" style="background: ${type === 'success' ? '#d4edda' : type === 'error' ? '#f8d7da' : '#d4edda'}">
+                    ${type === 'success' ? '✅' : type === 'error' ? '❌' : 'ℹ️'} ${message}
+                </div>
+            `;
+            setTimeout(() => {
+                resultDiv.style.display = 'none';
+                resultDiv.innerHTML = '';
+            }, 3000);
         }
 
-        // Мобильное меню
         function toggleMobileMenu() {
             document.getElementById('leftPanel').classList.toggle('open');
         }
 
-        // Закрытие меню при клике вне его
         document.addEventListener('click', function(event) {
             const panel = document.getElementById('leftPanel');
             const menuBtn = document.querySelector('.mobile-menu-btn');
@@ -928,9 +1319,7 @@
             }
         });
 
-        // ----------------------------------------------------------------------------
-        // 14. ЗАПУСК ПРИЛОЖЕНИЯ
-        // ----------------------------------------------------------------------------
+        // ----- 14. ЗАПУСК -----
         document.addEventListener('DOMContentLoaded', init);
     </script>
 </body>
