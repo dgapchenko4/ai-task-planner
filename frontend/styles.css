@@ -588,3 +588,156 @@ button:disabled { opacity: 0.6; cursor: not-allowed; }
 .task-item.filtered-out {
     display: none;
 }
+/* ===== КОМПАКТНАЯ ПАНЕЛЬ ФИЛЬТРОВ ===== */
+.filter-bar {
+    margin-bottom: 15px;
+    padding: 8px 12px;
+    background: #f8f9fa;
+    border-radius: 12px;
+}
+.filter-row {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+.filter-label {
+    font-size: 12px;
+    color: #666;
+    font-weight: 500;
+}
+.filter-chip {
+    background: #e9ecef;
+    color: #495057;
+    border: none;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    width: auto;
+    margin-top: 0;
+}
+.filter-chip:hover {
+    background: #dee2e6;
+    transform: translateY(-1px);
+}
+.filter-chip.active {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+}
+.reset-chip {
+    background: #dc3545;
+    color: white;
+}
+.reset-chip:hover {
+    background: #c82333;
+}
+
+/* ===== КОМПАКТНЫЕ ТЕГИ ===== */
+.tags-section {
+    margin-bottom: 15px;
+}
+.tags-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+.tags-header h4 {
+    color: #333;
+    font-size: 12px;
+    font-weight: 600;
+}
+.add-tag-btn {
+    background: #28a745;
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    font-size: 16px;
+    line-height: 1;
+    margin-top: 0;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.tags-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+.tag-item {
+    background: #e9ecef;
+    padding: 3px 8px;
+    border-radius: 16px;
+    font-size: 11px;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.tag-item:hover {
+    background: #dee2e6;
+    transform: translateY(-1px);
+}
+.tag-item.active {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+}
+.tag-item .remove-tag {
+    background: none;
+    color: #999;
+    font-size: 12px;
+    padding: 0;
+    width: auto;
+    margin: 0;
+    cursor: pointer;
+    opacity: 0.6;
+}
+.tag-item:hover .remove-tag {
+    opacity: 1;
+}
+.tag-item.active .remove-tag {
+    color: white;
+    opacity: 0.8;
+}
+.add-tag-input {
+    display: none;
+    margin-top: 8px;
+    gap: 6px;
+}
+.add-tag-input.active {
+    display: flex;
+}
+.add-tag-input input {
+    flex: 1;
+    padding: 5px 10px;
+    border: 1px solid #ddd;
+    border-radius: 20px;
+    font-size: 12px;
+}
+.add-tag-input button {
+    width: auto;
+    padding: 4px 10px;
+    font-size: 11px;
+    margin-top: 0;
+    border-radius: 20px;
+}
+
+/* ===== ФИЛЬТР ТЕГОВ В ЗАДАЧАХ ===== */
+.task-tag {
+    background: #e9ecef;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 10px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: inline-block;
+}
+.task-tag:hover {
+    background: #dee2e6;
+    transform: scale(1.02);
+}

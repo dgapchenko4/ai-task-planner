@@ -59,32 +59,28 @@
                     <button id="createBtn" onclick="createTask()">✨ Создать задачу</button>
                 </div>
 
-                <!-- УПРАВЛЕНИЕ ТЕГАМИ С ФИЛЬТРАЦИЕЙ -->
+                <!-- УПРАВЛЕНИЕ ТЕГАМИ (компактное) -->
                 <div class="tags-section" id="tagsBlock" style="display: none;">
                     <div class="tags-header">
                         <h4>🏷️ Мои теги</h4>
-                        <div>
-                            <button class="clear-filter-btn" onclick="clearTagFilter()" id="clearFilterBtn" style="display: none;">✖️ Сбросить фильтр</button>
-                            <button class="add-tag-btn" onclick="showAddTagInput()">+ Добавить тег</button>
-                        </div>
+                        <button class="add-tag-btn" onclick="showAddTagInput()">+</button>
                     </div>
                     <div id="tagsList" class="tags-list"></div>
                     <div id="addTagInput" class="add-tag-input">
                         <input type="text" id="newTagName" placeholder="Название тега" maxlength="20">
-                        <button onclick="addTag()">Добавить</button>
-                        <button onclick="hideAddTagInput()" style="background:#6c757d;">Отмена</button>
+                        <button onclick="addTag()">Доб</button>
+                        <button onclick="hideAddTagInput()" style="background:#6c757d;">✖</button>
                     </div>
                 </div>
 
-                <!-- ФИЛЬТР СТАТУСА -->
-                <div class="filter-section" id="filterBlock" style="display: none;">
-                    <div class="filter-header">
-                        <h4>🔍 Фильтры</h4>
-                    </div>
-                    <div class="filter-buttons">
-                        <button class="filter-btn active" data-filter="all" onclick="setStatusFilter('all')">📋 Все</button>
-                        <button class="filter-btn" data-filter="active" onclick="setStatusFilter('active')">⏳ Активные</button>
-                        <button class="filter-btn" data-filter="completed" onclick="setStatusFilter('completed')">✅ Выполненные</button>
+                <!-- КОМПАКТНАЯ ПАНЕЛЬ ФИЛЬТРОВ -->
+                <div class="filter-bar" id="filterBlock" style="display: none;">
+                    <div class="filter-row">
+                        <span class="filter-label">📌 Фильтры:</span>
+                        <button class="filter-chip active" data-filter="all" onclick="setStatusFilter('all')">Все</button>
+                        <button class="filter-chip" data-filter="active" onclick="setStatusFilter('active')">Активные</button>
+                        <button class="filter-chip" data-filter="completed" onclick="setStatusFilter('completed')">Выполн.</button>
+                        <button class="filter-chip reset-chip" onclick="clearAllFilters()" id="clearFiltersBtn" style="display: none;">✖ Сброс</button>
                     </div>
                 </div>
 
