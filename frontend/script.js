@@ -1,5 +1,5 @@
 // ============================================================================
-// AI TASK PLANNER - ПОЛНАЯ ЛОГИКА (АУТЕНТИФИКАЦИЯ + ТЕГИ + КАЛЕНДАРЬ)
+// AI TASK PLANNER - ПОЛНАЯ ЛОГИКА (АУТЕНТИФИКАЦИЯ + ТЕГИ + ФИЛЬТРАЦИЯ)
 // ============================================================================
 
 // ----- 1. ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ -----
@@ -8,6 +8,8 @@ let currentUser = null;
 let userTags = ['работа', 'учеба', 'личное', 'покупки', 'здоровье'];
 let currentDate = new Date();
 let editingTaskId = null;
+let selectedTagFilter = null;      // Выбранный тег для фильтрации
+let selectedStatusFilter = 'all';  // 'all', 'active', 'completed'
 const API_URL = 'http://localhost:5000';
 const STORAGE_KEYS = {
     users: 'ai_planner_users',
@@ -81,9 +83,7 @@ function loadUserTasks() {
     } else {
         tasks = [];
     }
-    renderTasks();
-    renderCalendar();
-    updateTaskCount();
+    applyFiltersAndRender();
 }
 
 function saveUserTasks() {
@@ -91,7 +91,68 @@ function saveUserTasks() {
     localStorage.setItem(getUserTasksKey(), JSON.stringify(tasks));
 }
 
-// ----- 4. АУТЕНТИФИКАЦИЯ -----
+// ----- 4. ФИЛЬТРАЦИЯ ЗАДАЧ -----
+function filterTasksByTag(tagName) {
+    if (selectedTagFilter === tagName) {
+        // Если уже выбран этот тег - сбрасываем фильтр
+        selectedTagFilter = null;
+    } else {
+        selectedTagFilter = tagName;
+    }
+    renderTags(); // Обновляем подсветку тегов
+    applyFiltersAndRender();
+}
+
+function clearTagFilter() {
+    selectedTagFilter = null;
+    renderTags();
+    applyFiltersAndRender();
+}
+
+function setStatusFilter(status) {
+    selectedStatusFilter = status;
+    // Обновляем активный класс у кнопок
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.classList.remove('active');
+        if (btn.getAttribute('data-filter') === status) {
+            btn.classList.add('active');
+        }
+    });
+    applyFiltersAndRender();
+}
+
+function getFilteredTasks() {
+    let filtered = [...tasks];
+    
+    // Фильтр по тегу
+    if (selectedTagFilter) {
+        filtered = filtered.filter(task => task.tags && task.tags.includes(selectedTagFilter));
+    }
+    
+    // Фильтр по статусу
+    if (selectedStatusFilter === 'active') {
+        filtered = filtered.filter(task => !task.completed);
+    } else if (selectedStatusFilter === 'completed') {
+        filtered = filtered.filter(task => task.completed);
+    }
+    
+    return filtered;
+}
+
+function applyFiltersAndRender() {
+    const filteredTasks = getFilteredTasks();
+    renderTasks(filteredTasks);
+    renderCalendar(filteredTasks);
+    updateTaskCount(filteredTasks.length);
+    
+    // Показываем/скрываем кнопку сброса фильтра
+    const clearFilterBtn = document.getElementById('clearFilterBtn');
+    if (clearFilterBtn) {
+        clearFilterBtn.style.display = selectedTagFilter ? 'inline-block' : 'none';
+    }
+}
+
+// ----- 5. АУТЕНТИФИКАЦИЯ -----
 function switchAuthTab(tab) {
     const loginForm = document.getElementById('loginForm');
     const registerForm = document.getElementById('registerForm');
@@ -173,11 +234,11 @@ function logout() {
     currentUser = null;
     userTags = ['работа', 'учеба', 'личное', 'покупки', 'здоровье'];
     tasks = [];
+    selectedTagFilter = null;
+    selectedStatusFilter = 'all';
     localStorage.removeItem(STORAGE_KEYS.currentUser);
     showAuthInterface();
-    renderTasks();
-    renderCalendar();
-    updateTaskCount();
+    applyFiltersAndRender();
     showNotification('Вы вышли из системы', 'info');
 }
 
@@ -186,6 +247,7 @@ function showUserInterface() {
     document.getElementById('userPanel').style.display = 'flex';
     document.getElementById('taskFormBlock').style.display = 'block';
     document.getElementById('tagsBlock').style.display = 'block';
+    document.getElementById('filterBlock').style.display = 'block';
     
     document.getElementById('userName').textContent = currentUser.username;
     document.getElementById('userEmail').textContent = currentUser.email;
@@ -196,6 +258,7 @@ function showAuthInterface() {
     document.getElementById('userPanel').style.display = 'none';
     document.getElementById('taskFormBlock').style.display = 'none';
     document.getElementById('tagsBlock').style.display = 'none';
+    document.getElementById('filterBlock').style.display = 'none';
     
     document.getElementById('loginEmail').value = '';
     document.getElementById('loginPassword').value = '';
@@ -205,15 +268,15 @@ function showAuthInterface() {
     document.getElementById('regConfirmPassword').value = '';
 }
 
-// ----- 5. РАБОТА С ТЕГАМИ -----
+// ----- 6. РАБОТА С ТЕГАМИ -----
 function renderTags() {
     const container = document.getElementById('tagsList');
     if (!container) return;
     
     container.innerHTML = userTags.map(tag => `
-        <div class="tag-item">
+        <div class="tag-item ${selectedTagFilter === tag ? 'active' : ''}" onclick="filterTasksByTag('${escapeHtml(tag)}')">
             <span>#${escapeHtml(tag)}</span>
-            <span class="remove-tag" onclick="removeTag('${escapeHtml(tag)}')">×</span>
+            <span class="remove-tag" onclick="event.stopPropagation(); removeTag('${escapeHtml(tag)}')">×</span>
         </div>
     `).join('');
 }
@@ -268,6 +331,11 @@ function removeTag(tagName) {
             }
         });
         
+        // Если удалённый тег был выбран для фильтрации - сбрасываем фильтр
+        if (selectedTagFilter === tagName) {
+            selectedTagFilter = null;
+        }
+        
         const users = getUsers();
         if (users[currentUser.email]) {
             users[currentUser.email].tags = userTags;
@@ -278,13 +346,12 @@ function removeTag(tagName) {
         
         saveUserTasks();
         renderTags();
-        renderTasks();
-        renderCalendar();
+        applyFiltersAndRender();
         showNotification(`Тег "${tagName}" удалён`, 'info');
     }
 }
 
-// ----- 6. ФОРМАТИРОВАНИЕ ДАТЫ -----
+// ----- 7. ФОРМАТИРОВАНИЕ ДАТЫ -----
 function formatDateFromGPT(dateString) {
     if (!dateString || dateString === 'null') return "Без срока";
     try {
@@ -311,7 +378,7 @@ function formatDateFromGPT(dateString) {
     }
 }
 
-// ----- 7. ПРОВЕРКА СЕРВЕРА -----
+// ----- 8. ПРОВЕРКА СЕРВЕРА -----
 async function checkServer() {
     const statusDiv = document.getElementById('status');
     try {
@@ -332,7 +399,7 @@ async function checkServer() {
     }
 }
 
-// ----- 8. СОЗДАНИЕ ЗАДАЧИ -----
+// ----- 9. СОЗДАНИЕ ЗАДАЧИ -----
 async function createTask() {
     if (!currentUser) {
         showNotification('Войдите в систему', 'warning');
@@ -398,9 +465,7 @@ async function createTask() {
             `;
             
             document.getElementById('taskText').value = '';
-            renderTasks();
-            renderCalendar();
-            updateTaskCount();
+            applyFiltersAndRender();
             
             setTimeout(() => {
                 resultDiv.style.display = 'none';
@@ -421,20 +486,30 @@ async function createTask() {
     }
 }
 
-// ----- 9. ОТОБРАЖЕНИЕ ЗАДАЧ -----
-function renderTasks() {
+// ----- 10. ОТОБРАЖЕНИЕ ЗАДАЧ -----
+function renderTasks(tasksToRender = null) {
     const container = document.getElementById('tasksList');
+    const tasksToShow = tasksToRender !== null ? tasksToRender : tasks;
+    
     if (!currentUser) {
         container.innerHTML = '<div class="empty-state">✨ Войдите в систему, чтобы видеть задачи</div>';
         return;
     }
     
-    if (tasks.length === 0) {
-        container.innerHTML = '<div class="empty-state">✨ Нет задач. Создайте первую!</div>';
+    if (tasksToShow.length === 0) {
+        let message = '✨ Нет задач. Создайте первую!';
+        if (selectedTagFilter) {
+            message = `✨ Нет задач с тегом #${selectedTagFilter}`;
+        } else if (selectedStatusFilter === 'active') {
+            message = '✨ Нет активных задач';
+        } else if (selectedStatusFilter === 'completed') {
+            message = '✨ Нет выполненных задач';
+        }
+        container.innerHTML = `<div class="empty-state">${message}</div>`;
         return;
     }
     
-    container.innerHTML = tasks.map(task => `
+    container.innerHTML = tasksToShow.map(task => `
         <div class="task-item ${task.completed ? 'completed' : ''}">
             <div class="task-title">${escapeHtml(task.title)}</div>
             <div class="task-meta">
@@ -442,7 +517,7 @@ function renderTasks() {
                     ${getPriorityIcon(task.priority)} ${getPriorityText(task.priority)}
                 </span>
                 <span>📅 ${task.due_date_display || "Без срока"}</span>
-                <span>🏷️ ${task.tags.map(t => `<span class="task-tag" onclick="addTagToTask(${task.id}, '${escapeHtml(t)}')">#${escapeHtml(t)}</span>`).join(' ')}</span>
+                <span>🏷️ ${task.tags.map(t => `<span class="task-tag" onclick="filterTasksByTag('${escapeHtml(t)}')">#${escapeHtml(t)}</span>`).join(' ')}</span>
             </div>
             <div class="task-actions">
                 <button class="complete-btn" onclick="toggleTask(${task.id})">
@@ -454,24 +529,12 @@ function renderTasks() {
     `).join('');
 }
 
-function addTagToTask(taskId, tagName) {
-    const task = tasks.find(t => t.id === taskId);
-    if (task && !task.tags.includes(tagName)) {
-        task.tags.push(tagName);
-        saveUserTasks();
-        renderTasks();
-        renderCalendar();
-        showNotification(`Тег #${tagName} добавлен к задаче`, 'info');
-    }
-}
-
 function toggleTask(id) {
     const task = tasks.find(t => t.id === id);
     if (task) {
         task.completed = !task.completed;
         saveUserTasks();
-        renderTasks();
-        renderCalendar();
+        applyFiltersAndRender();
         console.log(`🔄 Задача "${task.title}" ${task.completed ? 'выполнена' : 'возвращена'}`);
     }
 }
@@ -481,15 +544,14 @@ function deleteTask(id) {
         const task = tasks.find(t => t.id === id);
         tasks = tasks.filter(t => t.id !== id);
         saveUserTasks();
-        renderTasks();
-        renderCalendar();
-        updateTaskCount();
+        applyFiltersAndRender();
         console.log(`🗑️ Задача "${task?.title}" удалена`);
     }
 }
 
-// ----- 10. КАЛЕНДАРЬ С ПОДСВЕТКОЙ ПО ПРИОРИТЕТУ -----
-function renderCalendar() {
+// ----- 11. КАЛЕНДАРЬ С ПОДСВЕТКОЙ ПО ПРИОРИТЕТУ И ФИЛЬТРАЦИЕЙ -----
+function renderCalendar(tasksToRender = null) {
+    const tasksForCalendar = tasksToRender !== null ? tasksToRender : getFilteredTasks();
     const year = currentDate.getFullYear();
     const month = currentDate.getMonth();
     
@@ -528,7 +590,7 @@ function renderCalendar() {
         const dayTasksDiv = document.createElement('div');
         dayTasksDiv.className = 'day-tasks';
         
-        const dayTasks = tasks.filter(task => {
+        const dayTasks = tasksForCalendar.filter(task => {
             if (!task.due_date || task.due_date === null || task.due_date === 'null') return false;
             const taskDate = new Date(task.due_date);
             if (isNaN(taskDate.getTime())) return false;
@@ -537,7 +599,6 @@ function renderCalendar() {
         
         dayTasks.forEach(task => {
             const taskDiv = document.createElement('div');
-            // Добавляем класс приоритета для подсветки в календаре
             taskDiv.className = `day-task priority-${task.priority}`;
             if (task.completed) taskDiv.classList.add('completed');
             taskDiv.textContent = task.title.length > 20 ? 
@@ -567,7 +628,7 @@ function nextMonth() {
     renderCalendar();
 }
 
-// ----- 11. РЕДАКТИРОВАНИЕ ЗАДАЧИ -----
+// ----- 12. РЕДАКТИРОВАНИЕ ЗАДАЧИ -----
 function openEditModal(id) {
     const task = tasks.find(t => t.id === id);
     if (!task) return;
@@ -618,9 +679,7 @@ function saveEdit() {
         }
         
         saveUserTasks();
-        renderTasks();
-        renderCalendar();
-        updateTaskCount();
+        applyFiltersAndRender();
         showNotification('Задача обновлена', 'success');
     }
     closeModal();
@@ -631,11 +690,14 @@ function closeModal() {
     editingTaskId = null;
 }
 
-function updateTaskCount() {
-    document.getElementById('taskCount').textContent = tasks.length;
+function updateTaskCount(count) {
+    const taskCountElement = document.getElementById('taskCount');
+    if (taskCountElement) {
+        taskCountElement.textContent = count !== undefined ? count : tasks.length;
+    }
 }
 
-// ----- 12. ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ -----
+// ----- 13. ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ -----
 function getPriorityText(priority) {
     const texts = { 'high': 'Высокий', 'medium': 'Средний', 'low': 'Низкий' };
     return texts[priority] || 'Средний';
@@ -681,5 +743,5 @@ document.addEventListener('click', function(event) {
     }
 });
 
-// ----- 13. ЗАПУСК -----
+// ----- 14. ЗАПУСК -----
 document.addEventListener('DOMContentLoaded', init);

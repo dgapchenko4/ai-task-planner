@@ -513,3 +513,78 @@ button:disabled { opacity: 0.6; cursor: not-allowed; }
     .calendar-day { min-height: 60px; }
     .current-month { font-size: 1rem; }
 }
+/* ===== ФИЛЬТР ТЕГОВ ===== */
+.tags-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+.tags-header h4 {
+    color: #333;
+    font-size: 14px;
+}
+.clear-filter-btn {
+    background: #dc3545;
+    padding: 4px 10px;
+    font-size: 11px;
+    margin-top: 0;
+    width: auto;
+}
+.clear-filter-btn:hover {
+    background: #c82333;
+}
+
+/* Активный тег (выбран для фильтрации) */
+.tag-item.active {
+    background: #667eea;
+    color: white;
+}
+.tag-item.active span:first-child {
+    color: white;
+}
+.tag-item.active .remove-tag {
+    color: white;
+    opacity: 0.8;
+}
+
+/* ===== ФИЛЬТР СТАТУСА ===== */
+.filter-section {
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #e0e0e0;
+}
+.filter-header h4 {
+    color: #333;
+    font-size: 13px;
+    margin-bottom: 8px;
+}
+.filter-buttons {
+    display: flex;
+    gap: 8px;
+}
+.filter-btn {
+    background: #f0f0f0;
+    color: #333;
+    padding: 6px 12px;
+    font-size: 12px;
+    margin-top: 0;
+    width: auto;
+}
+.filter-btn.active {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+}
+.filter-btn:hover {
+    transform: translateY(-1px);
+}
+
+/* ===== АНИМАЦИЯ ПРИ ФИЛЬТРАЦИИ ===== */
+.task-item {
+    transition: all 0.3s ease;
+}
+.task-item.filtered-out {
+    display: none;
+}

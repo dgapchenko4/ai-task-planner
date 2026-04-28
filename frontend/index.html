@@ -7,7 +7,6 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <!-- Кнопка для мобильного меню -->
     <button class="mobile-menu-btn" onclick="toggleMobileMenu()">☰</button>
 
     <div class="app-container">
@@ -60,17 +59,32 @@
                     <button id="createBtn" onclick="createTask()">✨ Создать задачу</button>
                 </div>
 
-                <!-- УПРАВЛЕНИЕ ТЕГАМИ -->
+                <!-- УПРАВЛЕНИЕ ТЕГАМИ С ФИЛЬТРАЦИЕЙ -->
                 <div class="tags-section" id="tagsBlock" style="display: none;">
                     <div class="tags-header">
                         <h4>🏷️ Мои теги</h4>
-                        <button class="add-tag-btn" onclick="showAddTagInput()">+ Добавить тег</button>
+                        <div>
+                            <button class="clear-filter-btn" onclick="clearTagFilter()" id="clearFilterBtn" style="display: none;">✖️ Сбросить фильтр</button>
+                            <button class="add-tag-btn" onclick="showAddTagInput()">+ Добавить тег</button>
+                        </div>
                     </div>
                     <div id="tagsList" class="tags-list"></div>
                     <div id="addTagInput" class="add-tag-input">
                         <input type="text" id="newTagName" placeholder="Название тега" maxlength="20">
                         <button onclick="addTag()">Добавить</button>
                         <button onclick="hideAddTagInput()" style="background:#6c757d;">Отмена</button>
+                    </div>
+                </div>
+
+                <!-- ФИЛЬТР СТАТУСА -->
+                <div class="filter-section" id="filterBlock" style="display: none;">
+                    <div class="filter-header">
+                        <h4>🔍 Фильтры</h4>
+                    </div>
+                    <div class="filter-buttons">
+                        <button class="filter-btn active" data-filter="all" onclick="setStatusFilter('all')">📋 Все</button>
+                        <button class="filter-btn" data-filter="active" onclick="setStatusFilter('active')">⏳ Активные</button>
+                        <button class="filter-btn" data-filter="completed" onclick="setStatusFilter('completed')">✅ Выполненные</button>
                     </div>
                 </div>
 
